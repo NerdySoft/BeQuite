@@ -1,2 +1,4 @@
-# BeQuite 
-The app to measure max noise level
+# BeQuite
+
+mobile app for detecting noises and notifying users in a funny way
+
