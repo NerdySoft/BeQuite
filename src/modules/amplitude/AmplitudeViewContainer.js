@@ -1,5 +1,5 @@
 import {connect} from 'react-redux';
-import CounterView from './CounterView';
+import CounterView from './AmplitudeView';
 
 export default connect(
   state => ({

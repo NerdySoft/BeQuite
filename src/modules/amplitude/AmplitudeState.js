@@ -9,7 +9,7 @@ const initialState = Map({
 });
 
 const LOAD = 'AmplitudeState/LOAD';
-const INIT = 'AmplitudeState/INIT'
+const INIT = 'AmplitudeState/INIT';
 const RESET = 'AmplitudeState/RESET';
 
 export function load(amplitude) {

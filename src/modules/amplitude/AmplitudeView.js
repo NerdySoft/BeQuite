@@ -1,4 +1,4 @@
-import * as AmplitudeState from './CounterState';
+import * as AmplitudeState from './AmplitudeState';
 import * as NavigationState from '../../modules/navigation/NavigationState';
 import React, {PropTypes} from 'react';
 import {

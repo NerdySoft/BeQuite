@@ -2,7 +2,7 @@
 
 import {Effects} from 'redux-loop';
 import {initialState, dispatch} from '../../../../test/state';
-import * as CounterStateActions from '../CounterState';
+import * as CounterStateActions from '../AmplitudeState';
 
 describe('CounterState', () => {
 
@@ -20,7 +20,7 @@ describe('CounterState', () => {
   });
 
   describe('reset', () => {
-    it('should reset the counter state to initial value', () => {
+    it('should reset the amplitude state to initial value', () => {
       // create an incremented state to test against
       const [modifiedState] = dispatch(initialState, CounterStateActions.increment());
       expect(modifiedState.get('counter')).not.toBe(initialState.get('counter'));
