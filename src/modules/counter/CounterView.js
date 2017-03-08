@@ -7,7 +7,9 @@ import {
   Button,
   Text,
   View,
-  NativeModules
+  NativeModules,
+  NativeAppEventEmitter,
+  DeviceEventEmitter
 } from 'react-native';
 
 var AudioLevel  = NativeModules.AudioLevel;
@@ -46,24 +48,28 @@ const CounterView = React.createClass({
       this.setState({ status: status });
   },
   start() {
+
+    NativeAppEventEmitter.addListener('recordingProgress',
+      (data) => {
+        that.props.dispatch(AmplitudeState.load(data.currentAmp));
+      }
+    )
+
     AudioLevel.start();
 
     const that = this;
-    const intervId = setInterval(function(){
+    /*const intervId = setInterval(function(){
         AudioLevel.getAmplitude(amplitude => {
-            that.props.dispatch(AmplitudeState.load(amplitude));
+
             that.updateStatus(amplitude);
         });
-    }, 1000);
+    }, 1000000);
 
-    that.props.dispatch(AmplitudeState.init(intervId));
+    that.props.dispatch(AmplitudeState.init(intervId));*/
   },
   stop() {
-    if (this.props.intervId) {
-        clearInterval(this.props.intervId);
-        AudioLevel.stop();
-        this.setState({ status: '' });
-    }
+    AudioLevel.stop();
+    this.setState({ status: '' });
 
     return this.props.dispatch(AmplitudeState.reset());
   },
