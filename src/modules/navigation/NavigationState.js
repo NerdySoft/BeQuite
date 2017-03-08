@@ -33,8 +33,8 @@ const initialState = fromJS({
   tabs: {
     index: 0,
     routes: [
-      {key: 'HomeTab', title: 'HOME'},
-      {key: 'ProfileTab', title: 'PROFILE'}
+      {key: 'HomeTab', title: 'HOME', tabIcon: 'home'},
+      {key: 'ProfileTab', title: 'SETTINGS', tabIcon: 'cog'}
     ]
   },
   // Scenes for the `HomeTab` tab.
@@ -45,8 +45,12 @@ const initialState = fromJS({
   // Scenes for the `ProfileTab` tab.
   ProfileTab: {
     index: 0,
-    routes: [{key: 'Color', title: 'Color Screen'}]
-  }
+    routes: [{key: 'Color', title: 'Settings'}]
+  },
+  DecibelScene: {
+    index: 0,
+    routes: [{key: 'Decibel', title: 'Decibels'}]
+  },
 });
 
 export default function NavigationReducer(state = initialState, action) {

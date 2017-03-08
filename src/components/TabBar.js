@@ -17,7 +17,6 @@ const TabBar = React.createClass({
     currentTabIndex: PropTypes.number.isRequired,
     switchTab: PropTypes.func.isRequired
   },
-
   render() {
     return (
       <View style={[styles.navigationBar, {height: this.props.height}]}>
@@ -25,6 +24,7 @@ const TabBar = React.createClass({
           <TabBarButton
             key={'tab-bar-button-' + route.key}
             text={route.title}
+            icon={ route.tabIcon }
             action={() => this.props.switchTab(route.key)}
             isSelected={index === this.props.currentTabIndex}
           />

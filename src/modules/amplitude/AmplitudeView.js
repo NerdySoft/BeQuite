@@ -48,27 +48,17 @@ const CounterView = React.createClass({
       this.setState({ status: status });
   },
   start() {
+    const that = this;
 
-    NativeAppEventEmitter.addListener('recordingProgress',
-      (data) => {
-        that.props.dispatch(AmplitudeState.load(data.currentAmp));
-      }
-    )
+    NativeAppEventEmitter.addListener('recordingProgress', (data) =>
+        that.props.dispatch(AmplitudeState.load(data.currentAmp))
+    );
 
     AudioLevel.start();
-
-    const that = this;
-    /*const intervId = setInterval(function(){
-        AudioLevel.getAmplitude(amplitude => {
-
-            that.updateStatus(amplitude);
-        });
-    }, 1000000);
-
-    that.props.dispatch(AmplitudeState.init(intervId));*/
   },
   stop() {
     AudioLevel.stop();
+
     this.setState({ status: '' });
 
     return this.props.dispatch(AmplitudeState.reset());
@@ -124,8 +114,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white'
+    alignItems: 'center'
   },
   counterButton: {
     ...circle,

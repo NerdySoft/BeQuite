@@ -11,15 +11,15 @@ export default React.createClass({
   propTypes: {
     text: PropTypes.string.isRequired,
     action: PropTypes.func.isRequired,
+    icon: PropTypes.string.isRequired,
     isSelected: PropTypes.bool.isRequired
   },
   render() {
     return (
       <TouchableOpacity
         onPress={this.props.action}
-        style={[styles.button, this.props.isSelected && styles.selected]}
-        >
-        <Icon name='caret-down' size={20} color='#900' /><Text>{this.props.text}</Text>
+        style={[styles.button, this.props.isSelected && styles.selected]}>
+        <Icon name={ this.props.icon } size={20} color='white' /><Text style={{ color: 'white' }}>{this.props.text}</Text>
       </TouchableOpacity>
     );
   }
@@ -29,9 +29,10 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: '#969696',
   },
   selected: {
-    backgroundColor: 'yellow'
+    backgroundColor: '#6d6d6d'
   }
 });

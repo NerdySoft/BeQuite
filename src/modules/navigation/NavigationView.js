@@ -39,9 +39,10 @@ const NavigationView = React.createClass({
       <NavigationHeader
         {...sceneProps}
         onNavigateBack={this.props.onNavigateBack}
+        style={styles.navigation}
         renderTitleComponent={() => {
           return (
-            <NavigationHeader.Title>
+            <NavigationHeader.Title textStyle={styles.navigationTitle}>
               {sceneProps.scene.route.title}
             </NavigationHeader.Title>
           );
@@ -62,7 +63,7 @@ const NavigationView = React.createClass({
     const {tabs} = this.props.navigationState;
     const tabKey = tabs.routes[tabs.index].key;
     const scenes = this.props.navigationState[tabKey];
-    console.log(this.props.navigationState);
+
     return (
       <View style={styles.container}>
         <NavigationCardStack
@@ -86,6 +87,12 @@ const NavigationView = React.createClass({
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  navigation: {
+    backgroundColor: 'steelblue',
+  },
+  navigationTitle: {
+    color: 'white'
   },
   sceneContainer: {
     flex: 1,
