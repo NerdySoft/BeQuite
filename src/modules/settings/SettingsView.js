@@ -21,6 +21,9 @@ const ColorView = React.createClass({
   goToDecibels() {
     this.props.dispatch(NavigationState.pushRoute({ key: 'Decibel', title: `Decibels`}));
   },
+  goToEditLimits(){
+    this.props.dispatch(NavigationState.pushRoute({ key: 'EditLimit', title: `Edit Limits`}));
+  },
   render() {
     const index = this.props.index;
 
@@ -28,6 +31,9 @@ const ColorView = React.createClass({
       <View style={[styles.container]}>
         <Text onPress={this.goToDecibels}>
           { 'Tap me for going to "DECIBELS-VIEW"' }
+        </Text>
+        <Text onPress={this.goToEditLimits}>
+            { 'Tap me for going to "EDIT-LIMITS"' }
         </Text>
       </View>
     );

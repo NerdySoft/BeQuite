@@ -3,12 +3,14 @@ import {loop, combineReducers} from 'redux-loop';
 import NavigationStateReducer from '../modules/navigation/NavigationState';
 import AmplitudeStateReducer from '../modules/amplitude/AmplitudeState';
 import DecibelPickerStateReducer from '../modules/decibelPicker/DecibelPickerState';
+import EditLimitStateReducer from '../modules/editLimits/EditLimitsState';
 import SessionStateReducer, {RESET_STATE} from '../modules/session/SessionState';
 
 const reducers = {
   // Counter sample app state. This can be removed in a live application
   amplitude: AmplitudeStateReducer,
   decibels: DecibelPickerStateReducer,
+  limits: EditLimitStateReducer,
   // @NOTE: By convention, the navigation state must live in a subtree called
   //`navigationState`
   navigationState: NavigationStateReducer,
