@@ -9,8 +9,13 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import java.util.Map;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Arguments;
 
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 // these classes are required for playing the audio
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +28,7 @@ import android.os.Environment;
 public class AudioLevelModule extends ReactContextBaseJavaModule {
 
     private static MediaRecorder mRecorder = null;
-
+    private Timer timer;
     public AudioLevelModule(ReactApplicationContext reactContext) {
         super(reactContext);
     }
@@ -58,17 +63,10 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
         }catch(Exception e){}
     }*/
 
-    @ReactMethod
-    public int getTen() {
-        int i = 10;
-        return 309;
-        /*try{
-            if (mediaPlayer != null) {
-                if (mediaPlayer.isPlaying()) {
-                    mediaPlayer.pause();
-                }
-            }
-        }catch(Exception e){}*/
+    private void sendEvent(String eventName, Object params) {
+    getReactApplicationContext()
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit(eventName, params);
     }
 
     @ReactMethod
@@ -94,6 +92,15 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
                 mRecorder.setOutputFile("/dev/null");
                 mRecorder.prepare();
                 mRecorder.start();
+                timer = new Timer();
+                timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                  WritableMap body = Arguments.createMap();
+                  body.putInt("currentAmp", mRecorder.getMaxAmplitude());
+                  sendEvent("recordingProgress", body);
+                }
+              }, 0, 100);
             }
         }catch(Exception e){}
     }
@@ -106,6 +113,15 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
             mRecorder = null;
         }
     }
+
+    /*@ReactMethod
+    private void sendEvent(ReactContext reactContext,
+                       String eventName,
+                       @Nullable WritableMap params) {
+                         reactContext
+      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+      .emit(eventName, params);
+    }*/
 
     @ReactMethod
     public void getAmplitude(Callback amplitudeCallback) {
