@@ -1,8 +1,9 @@
-const INITIAL_STATE = {
-    title: '',
-    value: '',
-    text: ''
-};
+const INITIAL_STATE = [{
+    title: 'Test Limit',
+    decibelsValue: 10,
+    text: 'TestLimittext',
+
+}];
 
 const EDIT_LIMIT = 'LimitsState/EDIT_LIMIT';
 
