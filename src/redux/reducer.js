@@ -4,17 +4,17 @@ import NavigationStateReducer from '../modules/navigation/NavigationState';
 import AmplitudeStateReducer from '../modules/amplitude/AmplitudeState';
 import DecibelPickerStateReducer from '../modules/decibelPicker/DecibelPickerState';
 import SessionStateReducer, {RESET_STATE} from '../modules/session/SessionState';
-
+import LimitsStateReducer from '../modules/limits/LimitsState';
 const reducers = {
-  // Counter sample app state. This can be removed in a live application
-  amplitude: AmplitudeStateReducer,
-  decibels: DecibelPickerStateReducer,
-  // @NOTE: By convention, the navigation state must live in a subtree called
-  //`navigationState`
-  navigationState: NavigationStateReducer,
+    // Counter sample app state. This can be removed in a live application
+    amplitude: AmplitudeStateReducer,
+    decibels: DecibelPickerStateReducer,
+    limits: LimitsStateReducer,
+    // @NOTE: By convention, the navigation state must live in a subtree called
+    //`navigationState`
+    navigationState: NavigationStateReducer,
 
-  session: SessionStateReducer
-
+    session: SessionStateReducer
 };
 
 // initial state, accessor and mutator for supporting root-level
@@ -24,17 +24,17 @@ const getImmutable = (child, key) => child ? child.get(key) : void 0;
 const setImmutable = (child, key, value) => child.set(key, value);
 
 const namespacedReducer = combineReducers(
-  reducers,
-  immutableStateContainer,
-  getImmutable,
-  setImmutable
+    reducers,
+    immutableStateContainer,
+    getImmutable,
+    setImmutable
 );
 
 export default function mainReducer(state, action) {
-  const [nextState, effects] = action.type === RESET_STATE
-    ? namespacedReducer(action.payload, action)
-    : namespacedReducer(state || void 0, action);
+    const [nextState, effects] = action.type === RESET_STATE
+        ? namespacedReducer(action.payload, action)
+        : namespacedReducer(state || void 0, action);
 
-  // enforce the state is immutable
-  return loop(fromJS(nextState), effects);
+    // enforce the state is immutable
+    return loop(fromJS(nextState), effects);
 }

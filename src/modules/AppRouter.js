@@ -4,7 +4,7 @@ import React from 'react';
 import AmplitudeViewContainer from './amplitude/AmplitudeViewContainer';
 import ColorViewContainer from './settings/SettingsViewContainer';
 import DecibelPickerContainer from './decibelPicker/DecibelPickerViewContainer';
-
+import LimitsViewContainer from './limits/LimitsViewContainer';
 /**
  * AppRouter is responsible for mapping a navigator scene to a view
  */
@@ -17,6 +17,10 @@ export default function AppRouter(props) {
 
   if (key === 'Decibel') {
     return <DecibelPickerContainer />;
+  }
+
+  if (key === 'Limits') {
+    return <LimitsViewContainer />;
   }
 
   if (key.indexOf('Color') === 0) {
