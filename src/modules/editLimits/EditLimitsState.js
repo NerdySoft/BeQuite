@@ -1,7 +1,12 @@
-/*
+/*import {Map} from 'immutable';
 import {loop, Effects} from 'redux-loop';
 
-const initialState = [];
+ const initialState = Map({
+ title: '',
+ limitId: null,
+ limitMessage: '',
+ limit: 60
+ });
 
 const ADD = 'EditLimitState/ADD';
 const EDIT = 'EditLimitState/EDIT';
@@ -21,25 +26,30 @@ export function edit(limitId) {
     };
 }
 
-export function remove() {
-    return { type: REMOVE };
+export function remove(limitId) {
+    return {
+        type: REMOVE,
+        payload: limitId
+    };
 }
 
 export default function EditLimitStateReducer(state = initialState, action = {}) {
     switch (action.type) {
-        case INIT:
-            return state.merge({ 'intervId': action.payload, 'loaded': true });
-        case LOAD:
+        case ADD:
+            return state.push(action.payload);
+        case EDIT:
             return state.update('value', value => action.payload);
-        case RESET:
+        case REMOVE:
             return state.merge({ 'value': 0, 'intervId': 0, 'loaded': false });
         default:
             return state;
     }
-}
-*/
+}*/
+
+
 const initialState = [];
 
 export default function EditLimitStateReducer(state = initialState) {
     return state;
 }
+
