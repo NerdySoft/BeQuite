@@ -43,7 +43,7 @@ const ColorView = React.createClass({
                 <Text onPress={this.goToEditLimits}>
                     { 'Tap me for going to "EDIT-LIMITS"' }
                 </Text>
-                <Text onPress={this.goToLimits()}>
+                <Text onPress={this.goToLimits}>
                     { 'Tap me for going to "Limits"' }
                 </Text>
             </View>
