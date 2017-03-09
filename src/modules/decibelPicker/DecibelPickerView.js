@@ -2,45 +2,42 @@ import React, { PropTypes } from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
-  Button,
   Text,
-  View,
-  NativeModules,
-  NativeAppEventEmitter,
-  DeviceEventEmitter
+  ListView,
+  View
 } from 'react-native';
 
 const DecibelPickerView = React.createClass({
+  propTypes: {
+    setSceneParams: PropTypes.func,
+    decibels: PropTypes.array.isRequired
+  },
+  getInitialState() {
+    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+    return { decibels: ds.cloneWithRows(this.props.decibels) }
+  },
+  componentDidMount() {
+    this.props.setSceneParams({ msg: 'Hello from DECIBELS!' });
+  },
   render() {
-    const { decibels } = this.props;
-
     return (
-      <View style={styles.container}>
-        { decibels.map((value, index) => <Text key={ `decibel-${index}` }>{ value }</Text>) }
+      <View style={ styles.container }>
+        <ListView
+            dataSource={ this.state.decibels }
+            renderRow={ value =>
+              <View style={{ borderWidth: 0.2, marginTop: 0, borderColor: 'gray', alignSelf: 'stretch' }}>
+                <Text>{ this.props.data.toString() + value }</Text>
+              </View>
+            }
+        />
       </View>
     );
   }
 });
 
-const circle = {
-  borderWidth: 0,
-  borderRadius: 40,
-  width: 80,
-  height: 80
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  counterButton: {
-    ...circle,
-    backgroundColor: 'skyblue',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: 20
   },
   btnsContainer: {
     flexDirection: 'row',

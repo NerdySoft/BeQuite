@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react';
 import {
   NavigationExperimental,
   View,
+  Text,
   StyleSheet
 } from 'react-native';
 const {
@@ -47,6 +48,7 @@ const NavigationView = React.createClass({
             </NavigationHeader.Title>
           );
         }}
+
       />
     );
   },

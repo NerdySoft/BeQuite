@@ -15,19 +15,24 @@ const color = () => Math.floor(255 * Math.random());
  */
 const ColorView = React.createClass({
   propTypes: {
-    index: PropTypes.number.isRequired,
     dispatch: PropTypes.func.isRequired,
   },
+  getInitialState() {
+    return { text: 'Tap me for going to "DECIBELS-VIEW"' }
+  },
   goToDecibels() {
-    this.props.dispatch(NavigationState.pushRoute({ key: 'Decibel', title: `Decibels`}));
+    this.props.dispatch(NavigationState.pushRoute({
+      key: 'Decibel',
+      title: `Decibels`,
+      data: 'I came from Settings!',
+      navigateBackAction: data => this.setState({ text: data.msg })
+    }));
   },
   render() {
-    const index = this.props.index;
-
     return (
       <View style={[styles.container]}>
         <Text onPress={this.goToDecibels}>
-          { 'Tap me for going to "DECIBELS-VIEW"' }
+          { this.state.text }
         </Text>
       </View>
     );
