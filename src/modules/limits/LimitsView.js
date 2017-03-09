@@ -8,14 +8,17 @@ import {
     NativeModules,
     Card
 } from 'react-native';
-
+import * as NavigationState from '../../modules/navigation/NavigationState';
 const LimitsView = React.createClass({
+    goToEditLimits(){
+        this.props.dispatch(NavigationState.pushRoute({key: 'EditLimit', title: `Edit Limits`}));
+    },
     render() {
         const { limits } = this.props;
 
         return (
             <View style={styles.container}>
-                { limits.map((value, index) => <TouchableOpacity style={styles.limitButton} title={ `${index}` } key={ `limit-${index}` }>
+                { limits.map((value, index) => <TouchableOpacity onPress={this.goToEditLimits} style={styles.limitButton} title={ `${index}` } key={ `limit-${index}` }>
                     <Text style={styles.text}>{ value.title }</Text>
                     <Text style={styles.decibelsValue}>{ value.decibelsValue } db</Text>
                 </TouchableOpacity>) }
