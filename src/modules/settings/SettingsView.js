@@ -14,6 +14,7 @@ const color = () => Math.floor(255 * Math.random());
  * @TODO remove this module in a live application.
  */
 const ColorView = React.createClass({
+
     propTypes: {
         index: PropTypes.number.isRequired,
         dispatch: PropTypes.func.isRequired,
@@ -21,8 +22,15 @@ const ColorView = React.createClass({
     goToDecibels() {
         this.props.dispatch(NavigationState.pushRoute({key: 'Decibel', title: `Decibels`}));
     },
+    goToEditLimits(){
+        this.props.dispatch(NavigationState.pushRoute({key: 'EditLimit', title: `Edit Limits`}));
+    },
     goToLimits() {
-        this.props.dispatch(NavigationState.pushRoute({key: 'Limits', title: `Limits`, rightComponentAction: this.goToDecibels}));
+        this.props.dispatch(NavigationState.pushRoute({
+            key: 'Limits',
+            title: `Limits`,
+            rightComponentAction: this.goToDecibels
+        }));
     },
     render() {
         const index = this.props.index;
@@ -32,13 +40,17 @@ const ColorView = React.createClass({
                 <Text onPress={this.goToDecibels}>
                     { 'Tap me for going to "DECIBELS-VIEW"' }
                 </Text>
-                <Text onPress={this.goToLimits}>
-                    { 'Tap me for going to "Limits View"' }
+                <Text onPress={this.goToEditLimits}>
+                    { 'Tap me for going to "EDIT-LIMITS"' }
+                </Text>
+                <Text onPress={this.goToLimits()}>
+                    { 'Tap me for going to "Limits"' }
                 </Text>
             </View>
         );
     }
 });
+
 
 const styles = StyleSheet.create({
     container: {
