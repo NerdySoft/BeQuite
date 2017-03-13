@@ -36,7 +36,8 @@ const ColorView = React.createClass({
             key: 'Limits',
             title: `Limits`,
             data: 'I came from Settings!',
-            rightComponentAction: this.goToDecibels
+            showPlusButton: 'true',
+            //rightComponentAction: this.goToDecibels
         }));
     },
     render() {

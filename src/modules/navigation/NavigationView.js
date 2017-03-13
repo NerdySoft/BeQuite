@@ -41,22 +41,38 @@ const NavigationView = React.createClass({
         return (
             <NavigationHeader
                 {...sceneProps}
-                onNavigateBack={this.props.onNavigateBack}
+                onNavigateBack={this.props.onNavigateBack} //don't use it. I leave it here just 'in case'
                 style={styles.navigation}
+                //rendering back button(arrow left) only if we can go back
+                renderLeftComponent={() => {
+                    if (sceneProps.scene.index === 0 || !this.props.onNavigateBack) {
+                        return null;
+                    }
+                    return (
+                        <TouchableOpacity onPress={this.props.onNavigateBack} style={styles.backArrowTouchable}>
+                            <Icon name="angle-left" size={35} style={styles.backArrow} ></Icon>
+                        </TouchableOpacity>
+                    )
+                }}
                 renderTitleComponent={() => {
-          return (
-            <NavigationHeader.Title textStyle={styles.navigationTitle}>
-              {sceneProps.scene.route.title}
-            </NavigationHeader.Title>
-          );
-        }}
+                    return (
+                        <NavigationHeader.Title textStyle={styles.navigationTitle}>
+                            {sceneProps.scene.route.title}
+                            </NavigationHeader.Title>
+                    );
+                }}
                 renderRightComponent={() => {
-         return (
-             <TouchableOpacity onPress={sceneProps.scene.route.rightComponentAction}>
-             <Icon name="plus" size={40} ></Icon>
-             </TouchableOpacity>
-         );
-       }}
+                    if(!sceneProps.scene.route.showPlusButton){
+                        return null
+                    }
+                    return (
+                        <TouchableOpacity
+                            onPress={sceneProps.scene.route.rightComponentAction}
+                            style={styles.plusButtonTouchable}>
+                            <Icon name="plus" size={25} style={styles.plusButton}></Icon>
+                        </TouchableOpacity>
+                    );
+                }}
             />
         );
     },
@@ -99,7 +115,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     navigation: {
-        backgroundColor: 'steelblue',
+        backgroundColor: 'steelblue'
     },
     navigationTitle: {
         color: 'white'
@@ -107,6 +123,22 @@ const styles = StyleSheet.create({
     sceneContainer: {
         flex: 1,
         marginBottom: TAB_BAR_HEIGHT
+    },
+    backArrowTouchable:{
+        top: 10,
+        left: 10,
+        width: 25
+    },
+    backArrow:{
+        color: 'white'
+    },
+    plusButtonTouchable:{
+        top: 15,
+        right: 0,
+        width: 35
+    },
+    plusButton:{
+        color: 'white',
     }
 });
 
