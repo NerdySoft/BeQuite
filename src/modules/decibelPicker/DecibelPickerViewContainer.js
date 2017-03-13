@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import DecibelPickerView from './DecibelPickerView';
-import { setSceneParams } from '../../modules/navigation/NavigationState';
+import { setSceneParams, popRoute } from '../../modules/navigation/NavigationState';
 
 export default connect(
     state => {
@@ -11,6 +11,9 @@ export default connect(
     dispatch => ({
         setSceneParams(params) {
             dispatch(setSceneParams(params));
-        }
+        },
+        onNavigateBack() {
+            dispatch(popRoute());
+        },
     })
 )(DecibelPickerView);

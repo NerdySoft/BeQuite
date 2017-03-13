@@ -94,8 +94,10 @@ export default function NavigationReducer(state = initialState, action) {
       if (scene && typeof scene.navigateBackAction === 'function') {
         const params = state.get('sceneParams');
 
-        scene.navigateBackAction(params && params.toJS());
-        state.delete('sceneParams');
+        if (params) {
+            scene.navigateBackAction(params && params.toJS());
+            state.delete('sceneParams');
+        }
       }
 
       const nextScenes = NavigationStateUtils.pop(scenes);

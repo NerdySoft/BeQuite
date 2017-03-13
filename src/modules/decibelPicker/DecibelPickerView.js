@@ -17,7 +17,12 @@ const DecibelPickerView = React.createClass({
     return { decibels: ds.cloneWithRows(this.props.decibels) }
   },
   componentDidMount() {
-    this.props.setSceneParams({ msg: 'Hello from DECIBELS!' });
+    //this.props.setSceneParams({ msg: 'Hello from DECIBELS!' });
+  },
+  chooseDecibels(decibels){
+    this.props.setSceneParams({ msg: decibels });
+    this.props.onNavigateBack();
+
   },
   render() {
     return (
@@ -25,9 +30,12 @@ const DecibelPickerView = React.createClass({
         <ListView
             dataSource={ this.state.decibels }
             renderRow={ value =>
-              <View style={{ borderWidth: 0.2, marginTop: 0, borderColor: 'gray', alignSelf: 'stretch' }}>
-                <Text>{ this.props.data.toString() + value }</Text>
-              </View>
+            <TouchableOpacity
+                onPress={() => this.chooseDecibels(value)}
+                style={styles.limitButton}>
+                {/*<Text>{ this.props.data.toString() + value }</Text>*/}
+              <Text>{ value } db</Text>
+            </TouchableOpacity>
             }
         />
       </View>
@@ -49,6 +57,23 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 20,
     textAlign: 'center'
+  },
+  limitButton: {
+      alignSelf: 'stretch',
+      height: 70,
+      borderBottomColor: '#bbb',
+      borderBottomWidth: 1,
+      justifyContent: 'center',
+      marginLeft: 10,
+      marginRight: 10
+  },
+  text: {
+      paddingLeft: 10,
+      fontSize: 20
+  },
+  decibelsValue: {
+      paddingLeft: 10,
+      fontSize: 15,
   }
 });
 

@@ -15,7 +15,18 @@ import * as NavigationState from '../../modules/navigation/NavigationState';
 
 const EditLimtsView = React.createClass({
     goToDecibels() {
-        this.props.dispatch(NavigationState.pushRoute({ key: 'Decibel', title: `Decibels`}));
+        this.props.dispatch(NavigationState.pushRoute({
+            key: 'Decibel',
+            title: `Decibels`,
+            data: 'I came from Edit Limits View!',
+            navigateBackAction: data => this.setState({decibels: data.msg})}));
+    },
+    getInitialState() {
+        return {
+            decibels: '0',
+            title: '',
+            message: ''
+        }
     },
     deleteLimit(){
         //TODO: make function that will delete limit
@@ -41,7 +52,7 @@ const EditLimtsView = React.createClass({
                         <Text style={styles.buttontext}>Select Sound Limit</Text>
                     </View>
                     <View style={styles.arrowAndDb}>
-                        <Text style={styles.decibelsvalue}>500 DB</Text>
+                        <Text style={styles.decibelsvalue}>{this.state.decibels} DB</Text>
                         <Icon name="angle-right" size={22} style={styles.arrowRight}></Icon>
                     </View>
 

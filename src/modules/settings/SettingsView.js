@@ -17,24 +17,25 @@ const ColorView = React.createClass({
     propTypes: {
         dispatch: PropTypes.func.isRequired,
     },
-      getInitialState() {
-    return { text: 'Tap me for going to "DECIBELS-VIEW"' }
-  },
-  goToDecibels() {
-    this.props.dispatch(NavigationState.pushRoute({
-      key: 'Decibel',
-      title: `Decibels`,
-      data: 'I came from Settings!',
-      navigateBackAction: data => this.setState({ text: data.msg })
-    }));
-  },
+    getInitialState() {
+        return {text: 'Tap me for going to "DECIBELS-VIEW"'}
+    },
+    goToDecibels() {
+        this.props.dispatch(NavigationState.pushRoute({
+            key: 'Decibel',
+            title: `Decibels`,
+            data: 'I came from Settings!',
+            navigateBackAction: data => this.setState({text: data.msg})
+        }));
+    },
     goToEditLimits(){
-        this.props.dispatch(NavigationState.pushRoute({key: 'EditLimit', title: `Edit Limits`}));
+        this.props.dispatch(NavigationState.pushRoute({key: 'EditLimit', title: `Edit Limits`, data: 'I came from Settings!'}));
     },
     goToLimits() {
         this.props.dispatch(NavigationState.pushRoute({
             key: 'Limits',
             title: `Limits`,
+            data: 'I came from Settings!',
             rightComponentAction: this.goToDecibels
         }));
     },
@@ -44,7 +45,7 @@ const ColorView = React.createClass({
         return (
             <View style={[styles.container]}>
                 <Text onPress={this.goToDecibels}>
-                    { 'Tap me for going to "DECIBELS-VIEW"' }
+                    { this.state.text }
                 </Text>
                 <Text onPress={this.goToEditLimits}>
                     { 'Tap me for going to "EDIT-LIMITS"' }
@@ -55,32 +56,7 @@ const ColorView = React.createClass({
             </View>
         );
     }
-  propTypes: {
-    dispatch: PropTypes.func.isRequired,
-  },
-  getInitialState() {
-    return { text: 'Tap me for going to "DECIBELS-VIEW"' }
-  },
-  goToDecibels() {
-    this.props.dispatch(NavigationState.pushRoute({
-      key: 'Decibel',
-      title: `Decibels`,
-      data: 'I came from Settings!',
-      navigateBackAction: data => this.setState({ text: data.msg })
-    }));
-  },
-  render() {
-    return (
-      <View style={[styles.container]}>
-        <Text onPress={this.goToDecibels}>
-          { this.state.text }
-        </Text>
-      </View>
-    );
-  }
 });
-
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
