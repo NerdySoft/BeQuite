@@ -8,6 +8,7 @@ const {StateUtils: NavigationStateUtils} = NavigationExperimental;
 const PUSH_ROUTE = 'NavigationState/PUSH_ROUTE';
 const POP_ROUTE = 'NavigationState/POP_ROUTE';
 const SWITCH_TAB = 'NavigationState/SWITCH_TAB';
+const SET_PARAMS = 'NavigationState/SET_PARAMS';
 
 export function switchTab(key) {
   return {
@@ -21,6 +22,13 @@ export function pushRoute(route) {
   return {
     type: PUSH_ROUTE,
     payload: route
+  };
+}
+
+export function setSceneParams(params) {
+  return {
+    type: SET_PARAMS,
+    payload: params
   };
 }
 
@@ -45,7 +53,7 @@ const initialState = fromJS({
   // Scenes for the `ProfileTab` tab.
   ProfileTab: {
     index: 0,
-    routes: [{key: 'Color', title: 'Settings'}]
+    routes: [{key: 'Settings', title: 'Settings'}]
   },
   DecibelScene: {
     index: 0,
@@ -81,6 +89,15 @@ export default function NavigationReducer(state = initialState, action) {
       const tabs = state.get('tabs');
       const tabKey = tabs.getIn(['routes', tabs.get('index')]).get('key');
       const scenes = state.get(tabKey).toJS();
+      const scene = scenes.routes[scenes.routes.length - 1];
+
+      if (scene && typeof scene.navigateBackAction === 'function') {
+        const params = state.get('sceneParams');
+
+        scene.navigateBackAction(params && params.toJS());
+        state.delete('sceneParams');
+      }
+
       const nextScenes = NavigationStateUtils.pop(scenes);
       if (scenes !== nextScenes) {
         return state.set(tabKey, fromJS(nextScenes));
@@ -105,6 +122,11 @@ export default function NavigationReducer(state = initialState, action) {
         return state.set('tabs', fromJS(nextTabs));
       }
       return state;
+    }
+
+    case SET_PARAMS: {
+      return action.payload
+          ? state.set('sceneParams', fromJS(action.payload)) : state;
     }
 
     default:

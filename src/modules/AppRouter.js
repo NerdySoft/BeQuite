@@ -2,7 +2,7 @@
 
 import React from 'react';
 import AmplitudeViewContainer from './amplitude/AmplitudeViewContainer';
-import ColorViewContainer from './settings/SettingsViewContainer';
+import SettingsViewContainer from './settings/SettingsViewContainer';
 import DecibelPickerContainer from './decibelPicker/DecibelPickerViewContainer';
 
 import LimitsViewContainer from './limits/LimitsViewContainer';
@@ -13,13 +13,14 @@ import EditLimitContainer from './editLimits/EditLimitsViewContainer';
  */
 export default function AppRouter(props) {
   const key = props.scene.route.key;
+  const data = props.scene.route.data;
 
   if (key === 'Amplitude') {
     return <AmplitudeViewContainer />;
   }
 
   if (key === 'Decibel') {
-    return <DecibelPickerContainer />;
+    return <DecibelPickerContainer data={ data } />;
   }
   if (key === 'EditLimit') {
         return <EditLimitContainer />;
@@ -29,13 +30,8 @@ export default function AppRouter(props) {
     return <LimitsViewContainer />;
   }
 
-  if (key.indexOf('Color') === 0) {
-    const index = props.scenes.indexOf(props.scene);
-    return (
-      <ColorViewContainer
-        index={index}
-      />
-    );
+  if (key === 'Settings') {
+    return <SettingsViewContainer/>;
   }
 
   throw new Error('Unknown navigation key: ' + key);

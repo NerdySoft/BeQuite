@@ -1,9 +1,10 @@
 import React, {PropTypes} from 'react';
 import {
-    NavigationExperimental,
-    View,
-    StyleSheet,
-    TouchableOpacity
+  NavigationExperimental,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity
 } from 'react-native';
 const {
     CardStack: NavigationCardStack,
@@ -12,9 +13,6 @@ const {
 } = NavigationExperimental;
 import AppRouter from '../AppRouter';
 import TabBar from '../../components/TabBar';
-import {
-    Text,
-} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 // Customize bottom tab bar height here if desired

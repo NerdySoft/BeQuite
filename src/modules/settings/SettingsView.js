@@ -14,14 +14,20 @@ const color = () => Math.floor(255 * Math.random());
  * @TODO remove this module in a live application.
  */
 const ColorView = React.createClass({
-
     propTypes: {
-        index: PropTypes.number.isRequired,
         dispatch: PropTypes.func.isRequired,
     },
-    goToDecibels() {
-        this.props.dispatch(NavigationState.pushRoute({key: 'Decibel', title: `Decibels`}));
-    },
+      getInitialState() {
+    return { text: 'Tap me for going to "DECIBELS-VIEW"' }
+  },
+  goToDecibels() {
+    this.props.dispatch(NavigationState.pushRoute({
+      key: 'Decibel',
+      title: `Decibels`,
+      data: 'I came from Settings!',
+      navigateBackAction: data => this.setState({ text: data.msg })
+    }));
+  },
     goToEditLimits(){
         this.props.dispatch(NavigationState.pushRoute({key: 'EditLimit', title: `Edit Limits`}));
     },
@@ -49,6 +55,29 @@ const ColorView = React.createClass({
             </View>
         );
     }
+  propTypes: {
+    dispatch: PropTypes.func.isRequired,
+  },
+  getInitialState() {
+    return { text: 'Tap me for going to "DECIBELS-VIEW"' }
+  },
+  goToDecibels() {
+    this.props.dispatch(NavigationState.pushRoute({
+      key: 'Decibel',
+      title: `Decibels`,
+      data: 'I came from Settings!',
+      navigateBackAction: data => this.setState({ text: data.msg })
+    }));
+  },
+  render() {
+    return (
+      <View style={[styles.container]}>
+        <Text onPress={this.goToDecibels}>
+          { this.state.text }
+        </Text>
+      </View>
+    );
+  }
 });
 
 
