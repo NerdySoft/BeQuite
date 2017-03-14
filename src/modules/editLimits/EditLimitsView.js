@@ -31,6 +31,9 @@ const EditLimtsView = React.createClass({
     deleteLimit(){
         //TODO: make function that will delete limit
     },
+    saveLimit(){
+      //TODO: make function that will save limit
+    },
     render() {
         const { limits } = this.props;
 
@@ -59,11 +62,19 @@ const EditLimtsView = React.createClass({
 
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={this.deleteLimit}
-                    style={styles.deleteButton}>
-                    <Icon name="remove" size={22} style={styles.deleteIcon}>
+                    onPress={this.saveLimit}
+                    style={[styles.bigButton, styles.saveButton]}>
+                    <Icon name="check" size={22} style={styles.bigButtonIcon}>
                     </Icon>
-                    <Text style={styles.deleteText}>DELETE</Text>
+                    <Text style={styles.bigButtonText}>SAVE</Text>
+
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={this.deleteLimit}
+                    style={[styles.bigButton, styles.deleteButton]}>
+                    <Icon name="remove" size={22} style={styles.bigButtonIcon}>
+                    </Icon>
+                    <Text style={styles.bigButtonText}>DELETE</Text>
 
                 </TouchableOpacity>
             </View>
@@ -119,22 +130,27 @@ const styles = StyleSheet.create({
     decibelsvalue:{
 
     },
-    deleteButton:{
+    bigButton:{
         paddingTop: 10,
         paddingBottom: 10,
         alignSelf: 'stretch',
         marginTop: 18,
         marginBottom: 18,
         alignItems: 'center',
-        backgroundColor: 'rgba(255,0,0,0.6)',
         flexDirection: "row",
         justifyContent : 'center'
     },
-    deleteText:{
+    saveButton:{
+        backgroundColor: 'rgba(58,224,29,0.7)',
+    },
+    deleteButton:{
+        backgroundColor: 'rgba(255,0,0,0.6)',
+    },
+    bigButtonText:{
         marginLeft: 5,
         fontSize:14
     },
-    deleteIcon:{
+    bigButtonIcon:{
 
     }
 });
