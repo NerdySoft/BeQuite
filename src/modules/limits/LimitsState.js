@@ -1,26 +1,26 @@
-import { pushRoute } from '../navigation/NavigationState';
+import { popRoute } from '../navigation/NavigationState';
 
 const initialState = [];
 
-const ADD_LIMIT = 'LimitsState/ADD_LIMIT';
+const SAVE_LIMIT = 'LimitsState/SAVE_LIMIT';
 
-export function addLimitObj(obj) {
+export function saveLimitObj(obj) {
     return {
-        type: 'LimitsState/ADD_LIMIT',
+        type: 'LimitsState/SAVE_LIMIT',
         payload: obj
     };
 }
 
-export function addLimit(routeObj, limitObj) {
-    return (dispatch)=>{
-        dispatch(pushRoute(routeObj));
-        dispatch(addLimitObj(limitObj));
+export function saveLimit(limitObj) {
+    return dispatch => {
+        dispatch(saveLimitObj(limitObj));
+        dispatch(popRoute());
     }
 }
 
 export default function limitState(state = initialState, action) {
     switch (action.type) {
-        case ADD_LIMIT: {
+        case SAVE_LIMIT: {
             return [...state, action.payload];
         }
         default:

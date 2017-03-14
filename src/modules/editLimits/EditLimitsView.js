@@ -11,15 +11,17 @@ import {
     DeviceEventEmitter
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import * as NavigationState from '../../modules/navigation/NavigationState';
+import { pushRoute, setRightComponentAction } from '../navigation/NavigationState';
+import { saveLimit } from '../limits/LimitsState';
 
 const EditLimtsView = React.createClass({
     goToDecibels() {
-        this.props.dispatch(NavigationState.pushRoute({
+        this.props.dispatch(pushRoute({
             key: 'Decibel',
             title: `Decibels`,
             data: 'I came from Edit Limits View!',
-            navigateBackAction: data => this.setState({decibels: data.msg})}));
+            navigateBackAction: () => {}
+        }));
     },
     getInitialState() {
         return {
@@ -28,12 +30,16 @@ const EditLimtsView = React.createClass({
             message: ''
         }
     },
+    componentDidMount() {
+        setTimeout(() => this.props.dispatch(setRightComponentAction(
+            () => this.props.dispatch(saveLimit({ title: 'BRO', text: 'TEXT', decibelsValue: 1000 }))
+        )), 1000);
+    },
     deleteLimit(){
         //TODO: make function that will delete limit
     },
     render() {
-        const { limits, data } = this.props;
-
+        const { limits, data: { isUpdate } } = this.props;
 
         return (
             <View style={styles.container}>
@@ -60,7 +66,7 @@ const EditLimtsView = React.createClass({
 
                 </TouchableOpacity>
 
-                { !data && <TouchableOpacity
+                { isUpdate && <TouchableOpacity
                     onPress={this.deleteLimit}
                     style={[styles.bigButton, styles.deleteButton]}>
                     <Icon name="remove" size={22} style={styles.bigButtonIcon}>

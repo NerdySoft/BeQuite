@@ -14,7 +14,7 @@ const LimitsView = React.createClass({
         this.props.dispatch(NavigationState.pushRoute({
             key: 'EditLimit',
             title: `Edit Limits`,
-            //data: data,
+            data: { isUpdate: true },
             showRightComponent: 'true',
             iconName: 'save',
             rightComponentAction: ()=>this.props.dispatch(NavigationState.popRoute())

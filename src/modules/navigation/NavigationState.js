@@ -9,6 +9,7 @@ const PUSH_ROUTE = 'NavigationState/PUSH_ROUTE';
 const POP_ROUTE = 'NavigationState/POP_ROUTE';
 const SWITCH_TAB = 'NavigationState/SWITCH_TAB';
 const SET_PARAMS = 'NavigationState/SET_PARAMS';
+const SET_RIGHT_COMPONENT_ACTION = 'NavigationState/SET_RIGHT_COMPONENT_ACTION';
 
 export function switchTab(key) {
   return {
@@ -29,6 +30,13 @@ export function setSceneParams(params) {
   return {
     type: SET_PARAMS,
     payload: params
+  };
+}
+
+export function setRightComponentAction(action) {
+  return {
+    type: SET_RIGHT_COMPONENT_ACTION,
+    payload: action
   };
 }
 
@@ -127,6 +135,18 @@ export default function NavigationReducer(state = initialState, action) {
     case SET_PARAMS: {
       return action.payload
           ? state.set('sceneParams', fromJS(action.payload)) : state;
+    }
+
+    case SET_RIGHT_COMPONENT_ACTION: {
+      const _state = state.toJS();
+      const tabs = _state.tabs;
+      const key = tabs.routes[tabs.index].key;
+      const scenes = _state[key].routes;
+      const currentScene = scenes[scenes.length - 1];
+
+      currentScene.rightComponentAction = action.payload;
+
+      return fromJS(_state);
     }
 
     default:

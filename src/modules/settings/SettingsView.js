@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { addLimit } from '../limits/LimitsState'
+
 import {
     Text,
     View,
@@ -8,29 +8,27 @@ import {
     TouchableOpacity
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import * as NavigationState from '../../modules/navigation/NavigationState';
+import { saveLimit } from '../limits/LimitsState'
+import { pushRoute } from '../navigation/NavigationState';
 
 const SettingsView = React.createClass({
     propTypes: {
         dispatch: PropTypes.func.isRequired,
     },
     goToLimits() {
-        this.props.dispatch(NavigationState.pushRoute({
+        this.props.dispatch(pushRoute({
             key: 'Limits',
             title: `Limits`,
-            data: 'I came from Settings!',
             showRightComponent: 'true',
             iconName: 'plus',
-            //rightComponentAction for plus button
-            rightComponentAction: () => this.props.dispatch(addLimit({
+            // rightComponentAction for plus button
+            rightComponentAction: () => this.props.dispatch(pushRoute({
                 key: 'EditLimit',
-                title: `Edit Limits`,
-                data: 'I came from LimitView!',
+                title: `Edit Limit`,
+                data: { isUpdate: false },
                 showRightComponent: 'true',
                 iconName: 'save',
-                //rightComponentAction for save button
-                rightComponentAction: ()=>this.props.dispatch(NavigationState.popRoute())
-            }, { title: 'NEW LIMIT23', decibelsValue: 1000, text: 'some text' }))
+            }))
         }));
     },
     render() {
