@@ -11,9 +11,11 @@ export function addLimitObj(obj) {
     };
 }
 
-export function addLimit(dispatch) {
-        dispatch(pushRoute({key: 'EditLimit', title: `Edit Limits`, data: 'I came from Settings!'}));
-        dispatch(addLimitObj({ title: 'NEW LIMIT23', decibelsValue: 1000, text: 'some text' }));
+export function addLimit(routeObj, limitObj) {
+    return (dispatch)=>{
+        dispatch(pushRoute(routeObj));
+        dispatch(addLimitObj(limitObj));
+    }
 }
 
 export default function limitState(state = initialState, action) {

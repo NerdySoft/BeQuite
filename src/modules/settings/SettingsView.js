@@ -39,7 +39,16 @@ const ColorView = React.createClass({
             data: 'I came from Settings!',
             showRightComponent: 'true',
             iconName: 'plus',
-            rightComponentAction: () => this.props.dispatch(addLimit)
+            //rightComponentAction for plus button
+            rightComponentAction: () => this.props.dispatch(addLimit({
+                key: 'EditLimit',
+                title: `Edit Limits`,
+                data: 'I came from Settings!',
+                showRightComponent: 'true',
+                iconName: 'save',
+                //rightComponentAction for save button
+                rightComponentAction: ()=>this.props.dispatch(NavigationState.popRoute())
+            }, { title: 'NEW LIMIT23', decibelsValue: 1000, text: 'some text' }))
         }));
     },
     render() {

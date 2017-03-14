@@ -10,23 +10,24 @@ import {
 } from 'react-native';
 import * as NavigationState from '../../modules/navigation/NavigationState';
 const LimitsView = React.createClass({
-    goToEditLimits(){
+    getSaveLimitRoute(){
         this.props.dispatch(NavigationState.pushRoute({
             key: 'EditLimit',
             title: `Edit Limits`,
-            data: 'I came from LimitsView!',
+            //data: data,
             showRightComponent: 'true',
             iconName: 'save',
-            rightComponentAction: ()=>{
-
-            }
+            rightComponentAction: ()=>this.props.dispatch(NavigationState.popRoute())
         }));
+    },
+    goToEditLimits(){
+        this.getSaveLimitRoute();
     },
     render() {
         const { limits } = this.props;
         return (
             <View style={styles.container}>
-                { limits.map((value, index) => <TouchableOpacity onPress={this.goToEditLimits} style={styles.limitButton} title={ `${index}` } key={ `limit-${index}` }>
+                { limits.map((value, index) => <TouchableOpacity onPress={this.getSaveLimitRoute} style={styles.limitButton} title={ `${index}` } key={ `limit-${index}` }>
                     <Text style={styles.text}>{ value.title }</Text>
                     <Text style={styles.decibelsValue}>{ value.decibelsValue } db</Text>
                 </TouchableOpacity>) }
