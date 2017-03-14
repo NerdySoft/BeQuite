@@ -31,11 +31,9 @@ const EditLimtsView = React.createClass({
     deleteLimit(){
         //TODO: make function that will delete limit
     },
-    saveLimit(){
-      //TODO: make function that will save limit
-    },
     render() {
-        const { limits } = this.props;
+        const { limits, data } = this.props;
+
 
         return (
             <View style={styles.container}>
@@ -61,22 +59,15 @@ const EditLimtsView = React.createClass({
 
 
                 </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={this.saveLimit}
-                    style={[styles.bigButton, styles.saveButton]}>
-                    <Icon name="check" size={22} style={styles.bigButtonIcon}>
-                    </Icon>
-                    <Text style={styles.bigButtonText}>SAVE</Text>
 
-                </TouchableOpacity>
-                <TouchableOpacity
+                { !data && <TouchableOpacity
                     onPress={this.deleteLimit}
                     style={[styles.bigButton, styles.deleteButton]}>
                     <Icon name="remove" size={22} style={styles.bigButtonIcon}>
                     </Icon>
                     <Text style={styles.bigButtonText}>DELETE</Text>
-
-                </TouchableOpacity>
+                    </TouchableOpacity>
+                }
             </View>
         );
     }

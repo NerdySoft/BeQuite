@@ -43,7 +43,7 @@ const ColorView = React.createClass({
             rightComponentAction: () => this.props.dispatch(addLimit({
                 key: 'EditLimit',
                 title: `Edit Limits`,
-                data: 'I came from Settings!',
+                data: 'I came from LimitView!',
                 showRightComponent: 'true',
                 iconName: 'save',
                 //rightComponentAction for save button

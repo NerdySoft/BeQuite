@@ -23,7 +23,7 @@ export default function AppRouter(props) {
     return <DecibelPickerContainer data={ data } />;
   }
   if (key === 'EditLimit') {
-        return <EditLimitContainer />;
+        return <EditLimitContainer data={ data } />;
   }
 
   if (key === 'Limits') {
