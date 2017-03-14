@@ -62,14 +62,14 @@ const NavigationView = React.createClass({
                     );
                 }}
                 renderRightComponent={() => {
-                    if(!sceneProps.scene.route.showPlusButton){
+                    if(!sceneProps.scene.route.showRightComponent && !sceneProps.scene.route.iconName){
                         return null
                     }
                     return (
                         <TouchableOpacity
                             onPress={sceneProps.scene.route.rightComponentAction}
                             style={styles.plusButtonTouchable}>
-                            <Icon name="plus" size={25} style={styles.plusButton}/>
+                            <Icon name={sceneProps.scene.route.iconName} size={25} style={styles.plusButton}></Icon>
                         </TouchableOpacity>
                     );
                 }}

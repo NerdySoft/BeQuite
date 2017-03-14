@@ -3,7 +3,6 @@ import {loop, combineReducers} from 'redux-loop';
 import NavigationStateReducer from '../modules/navigation/NavigationState';
 import AmplitudeStateReducer from '../modules/amplitude/AmplitudeState';
 import DecibelPickerStateReducer from '../modules/decibelPicker/DecibelPickerState';
-import EditLimitStateReducer from '../modules/editLimits/EditLimitsState';
 import SessionStateReducer, {RESET_STATE} from '../modules/session/SessionState';
 import LimitsStateReducer from '../modules/limits/LimitsState';
 const reducers = {

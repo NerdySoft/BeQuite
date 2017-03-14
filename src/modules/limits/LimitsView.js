@@ -10,19 +10,27 @@ import {
 } from 'react-native';
 import * as NavigationState from '../../modules/navigation/NavigationState';
 const LimitsView = React.createClass({
+    getSaveLimitRoute(){
+        this.props.dispatch(NavigationState.pushRoute({
+            key: 'EditLimit',
+            title: `Edit Limits`,
+            //data: data,
+            showRightComponent: 'true',
+            iconName: 'save',
+            rightComponentAction: ()=>this.props.dispatch(NavigationState.popRoute())
+        }));
+    },
     goToEditLimits(){
-        this.props.dispatch(NavigationState.pushRoute({key: 'EditLimit', title: `Edit Limits`}));
+        this.getSaveLimitRoute();
     },
     render() {
         const { limits } = this.props;
         return (
             <View style={styles.container}>
-                { limits.map((value, index) =>
-                    <TouchableOpacity onPress={this.goToEditLimits} style={styles.limitButton} title={ `${index}` } key={ `limit-${index}` }>
-                        <Text style={styles.text}>{ value.title }</Text>
-                        <Text style={styles.decibelsValue}>{ value.decibelsValue } db</Text>
-                    </TouchableOpacity>)
-                }
+                { limits.map((value, index) => <TouchableOpacity onPress={this.getSaveLimitRoute} style={styles.limitButton} title={ `${index}` } key={ `limit-${index}` }>
+                    <Text style={styles.text}>{ value.title }</Text>
+                    <Text style={styles.decibelsValue}>{ value.decibelsValue } db</Text>
+                </TouchableOpacity>) }
             </View>
         );
     }
