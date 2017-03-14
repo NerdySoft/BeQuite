@@ -29,7 +29,8 @@ const CounterView = React.createClass({
           medium: 8000,
           high: 12000
         },
-        status: 'Click \'Start\' to measure noise'
+        status: 'Click \'Start\' to measure noise',
+        isAudioLevelActive: true
       }
   },
   updateStatus(amp) {
@@ -50,14 +51,19 @@ const CounterView = React.createClass({
   start() {
     const that = this;
 
-    NativeAppEventEmitter.addListener('recordingProgress', (data) =>
-        that.props.dispatch(AmplitudeState.load(data.currentAmp))
-    );
-
-    AudioLevel.start();
+    NativeAppEventEmitter.addListener('recordingProgress', (data) => {
+        that.props.dispatch(AmplitudeState.load(data.currentAmp));
+        that.updateStatus(data.currentAmp);
+    });
+      this.setState({isAudioLevelActive: false})
+   AudioLevel.start();
+   // AudioLevel.startRecording();//start recording audio
+   //AudioLevel.playSong(); //play default song
   },
   stop() {
+    this.setState({isAudioLevelActive: true})
     AudioLevel.stop();
+    //AudioLevel.stopRecording() //stop recording audio
 
     this.setState({ status: '' });
 
@@ -67,7 +73,8 @@ const CounterView = React.createClass({
     const loadingStyle = this.props.loading
       ? {backgroundColor: '#eee'}
       : null;
-    const isAudioLevelActive = this.props.loaded;
+      const isAudioLevelActive = this.state.isAudioLevelActive;
+    //const isAudioLevelActive = this.props.loaded;
     const statusMessage = this.state.status;
 
     return (
@@ -87,12 +94,13 @@ const CounterView = React.createClass({
 
         <View style={styles.btnsContainer}>
             <Button onPress={this.start}
-                disabled={isAudioLevelActive}
+                disabled={!isAudioLevelActive}
                 title="Start"
                 color="steelblue"
                 accessibilityLabel="Start"
               />
             <Button onPress={this.stop}
+              disabled={isAudioLevelActive}
               title="Stop"
               color="steelblue"
               accessibilityLabel="Stop"

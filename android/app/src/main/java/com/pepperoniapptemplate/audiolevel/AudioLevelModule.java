@@ -16,153 +16,195 @@ import com.facebook.react.bridge.Arguments;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-// these classes are required for playing the audio
+import java.util.HashMap;
+
 import java.io.File;
 import java.io.IOException;
 
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+
+import android.Manifest;
+import android.content.Context;
 
 public class AudioLevelModule extends ReactContextBaseJavaModule {
 
-    private static MediaRecorder mRecorder = null;
-    private Timer timer;
-    public AudioLevelModule(ReactApplicationContext reactContext) {
-        super(reactContext);
-    }
+  private static final String DocumentDirectoryPath = "DocumentDirectoryPath";
+  private static final String PicturesDirectoryPath = "PicturesDirectoryPath";
+  private static final String MainBundlePath = "MainBundlePath";
+  private static final String CachesDirectoryPath = "CachesDirectoryPath";
+  private static final String LibraryDirectoryPath = "LibraryDirectoryPath";
+  private static final String MusicDirectoryPath = "MusicDirectoryPath";
+  private static final String DownloadsDirectoryPath = "DownloadsDirectoryPath";
 
-    @Override
-    public String getName() {
-        return "AudioLevel";
-    }
-/*    @ReactMethod
-    public void preparePlayer(String url) {
-        try{
-            if (mediaPlayer != null) {
-                mediaPlayer.release();
-                mediaPlayer = null;
-            }
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.setDataSource(url);
-            mediaPlayer.setLooping(true);
-            mediaPlayer.prepareAsync();
-        }catch(Exception e){  }
-    }
+  private Context context;
+  private static MediaRecorder mRecorder = null;
+  private static MediaRecorder nRecorder = null;
+  private static MediaPlayer mPlayer = null;
+  private String currentOutputFile;
+  private Timer timer;
+  private boolean isRecording = false;
+  private int recorderSecondsElapsed;
+  private static String nFileName = null;
 
-    @ReactMethod
-    public void play() {
-        try{
-            if (mediaPlayer != null) {
-                if (!mediaPlayer.isPlaying()) {
-                    mediaPlayer.start();
-                }
-            }
-        }catch(Exception e){}
-    }*/
+  public AudioLevelModule(ReactApplicationContext reactContext) {
+    super(reactContext);
+  }
 
-    private void sendEvent(String eventName, Object params) {
-    getReactApplicationContext()
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-            .emit(eventName, params);
-    }
+  @Override
+  public Map<String, Object> getConstants() {
+    Map<String, Object> constants = new HashMap<>();
+    constants.put(DocumentDirectoryPath, this.getReactApplicationContext().getFilesDir().getAbsolutePath());
+    constants.put(PicturesDirectoryPath,
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath());
+    constants.put(MainBundlePath, "");
+    constants.put(CachesDirectoryPath, this.getReactApplicationContext().getCacheDir().getAbsolutePath());
+    constants.put(LibraryDirectoryPath, "");
+    constants.put(MusicDirectoryPath,
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath());
+    constants.put(DownloadsDirectoryPath,
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+    return constants;
+  }
 
-    @ReactMethod
-    public void isEqual(
-            int a,
-            int b,
-            Callback booleanCallback) {
-        boolean equal = a == b;
-        booleanCallback.invoke(equal);
-    }
+  @Override
+  public String getName() {
+    return "AudioLevel";
+  }
 
+  //maybe we will need this later?
+  @ReactMethod
+  public void checkAuthorizationStatus(Promise promise) {
+    int permissionCheck = ContextCompat.checkSelfPermission(getCurrentActivity(), Manifest.permission.RECORD_AUDIO);
+    boolean permissionGranted = permissionCheck == PackageManager.PERMISSION_GRANTED;
+    promise.resolve(permissionGranted);
+  }
 
+  @ReactMethod
+private void startRecording() {
+        
+        nFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "LastNoiseRecord.3gp";
 
+        //nFileName = getExternalCacheDir().getAbsolutePath();
+        //nFileName += "/audiorecordtest.3gp";
+        nRecorder = new MediaRecorder();
 
-    @ReactMethod
-    public void start() {
+        nRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        nRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        nRecorder.setOutputFile(nFileName);
+        nRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
         try {
-            if (mRecorder == null) {
-                mRecorder = new MediaRecorder();
-                mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-                mRecorder.setOutputFile("/dev/null");
-                mRecorder.prepare();
-                mRecorder.start();
-                timer = new Timer();
-                timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                  WritableMap body = Arguments.createMap();
-                  body.putInt("currentAmp", mRecorder.getMaxAmplitude());
-                  sendEvent("recordingProgress", body);
-                }
-              }, 0, 1000);
-            }
-        }catch(Exception e){}
-    }
-
-    @ReactMethod
-    public void stop() {
-        if (mRecorder != null) {
-            mRecorder.stop();
-            mRecorder.release();
-            mRecorder = null;
+            nRecorder.prepare();
+        } catch (IOException e) {
+            //Log.e(LOG_TAG, "prepare() failed");
         }
+
+        nRecorder.start();
+        sendEvent("recordingNoiseStart", null);
     }
 
-    /*@ReactMethod
-    private void sendEvent(ReactContext reactContext,
-                       String eventName,
-                       @Nullable WritableMap params) {
-                         reactContext
-      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-      .emit(eventName, params);
-    }*/
-
-    @ReactMethod
-    public void getAmplitude(Callback amplitudeCallback) {
-        if (mRecorder != null) {
-            amplitudeCallback.invoke(mRecorder.getMaxAmplitude());
-            //amplitudeCallback.invoke("azazazaza");
-        }
-        else
-            amplitudeCallback.invoke("catch");
-
+  @ReactMethod
+  public void start() {
+    try {
+      if (mRecorder == null) {
+        mRecorder = new MediaRecorder();
+        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mRecorder.setOutputFile("/dev/null");
+        mRecorder.prepare();
+        mRecorder.start();
+        stopTimer();
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+          @Override
+          public void run() {
+            WritableMap body = Arguments.createMap();
+            body.putInt("currentAmp", mRecorder.getMaxAmplitude());
+            sendEvent("recordingProgress", body);
+          }
+        }, 0, 500);
+      }
+    } catch (Exception e) {
     }
-/*    private void sendEvent(ReactContext reactContext,
-                           String eventName,
-                           @Nullable WritableMap params) {
-        reactContext
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(eventName, params);
-    }*/
+  }
 
-/*    @ReactMethod
-    public void getAmplitudeViaEvent() {
-        WritableMap event = Arguments.createMap();
-        event.putString("message", "MyMessage");
-        ReactContext reactContext = (ReactContext)getContext();
-        reactContext.getJSModule(RCTEventEmitter.class).
-                receiveEvent(getId("topChange",event));
+  @ReactMethod
+  public void playSong() {
+    try {
+      //commented temporary. now every time is played will create new instance of MediaPlayer
+      //TODO: need to change folder from where to play 
+      //if (mPlayer == null) {
+          //mPlayer=MediaPlayer.create(this.getReactApplicationContext(), Uri.parse(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Alert.mp3"));
+          //mPlayer.start();
+          
+          
+          String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Alert.mp3";
+          mPlayer = new  MediaPlayer();
+          mPlayer.setDataSource(filePath);
+          mPlayer.prepare();   
+          mPlayer.start();
+      //}
+    } catch (Exception e) {
+    }
+  }
 
-        *//*int countdown = 0;
-        while (countdown < 1000){
-            if (mRecorder != null) {
-                //amplitudeCallback.invoke(mRecorder.getMaxAmplitude());
-                //amplitudeCallback.invoke("azazazaza");
-                sendEvent(reactContext, "getAmplitude", mRecorder.getMaxAmplitude());
-            }
-            else{
-                sendEvent(reactContext, "getAmplitude", "error");
-            }
-            ++countdown;
-            Thread.sleep(500);
-        }*//*
-    }*/
+  private void stopTimer() {
+    //recorderSecondsElapsed = 0;
+    if (timer != null) {
+      timer.cancel();
+      timer.purge();
+      timer = null;
+    }
+  }
 
+  @ReactMethod
+  public void stop() {
+    stopTimer();
+    try {
+      mRecorder.stop();
+      mRecorder.release();
+    } catch (final RuntimeException e) {
+      // https://developer.android.com/reference/android/media/MediaRecorder.html#stop()
+      //logAndRejectPromise(promise, "RUNTIME_EXCEPTION", "No valid audio data received. You may be using a device that can't record audio.");
+      return;
+    } finally {
+      mRecorder = null;
+    }
+    //promise.resolve(currentOutputFile);
+    sendEvent("recordingFinished", null);
+  }
+  @ReactMethod
+  public void stopRecording() {
+    //stopTimer();
 
+    try {
+      nRecorder.stop();
+      nRecorder.release();
+    } catch (final RuntimeException e) {
+      // https://developer.android.com/reference/android/media/MediaRecorder.html#stop()
+      //logAndRejectPromise(promise, "RUNTIME_EXCEPTION", "No valid audio data received. You may be using a device that can't record audio.");
+      return;
+    } finally {
+      nRecorder = null;
+    }
+    //promise.resolve(currentOutputFile);
+    sendEvent("recordingNoiseFinished", null);
+  }
+
+  private void sendEvent(String eventName, Object params) {
+    getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName,
+        params);
+  }
+
+  private void logAndRejectPromise(Promise promise, String errorCode, String errorMessage) {
+    //Log.e(TAG, errorMessage);
+    promise.reject(errorCode, errorMessage);
+  }
 }
