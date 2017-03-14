@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react';
+import { addLimit } from '../limits/LimitsState'
 import {
     Text,
     View,
@@ -25,7 +26,7 @@ const ColorView = React.createClass({
             key: 'Decibel',
             title: `Decibels`,
             data: 'I came from Settings!',
-            navigateBackAction: data => this.setState({text: data.msg})
+            navigateBackAction: data => this.setState({text: data.msg}),
         }));
     },
     goToEditLimits(){
@@ -38,7 +39,7 @@ const ColorView = React.createClass({
             data: 'I came from Settings!',
             showRightComponent: 'true',
             iconName: 'plus',
-            //rightComponentAction: this.goToDecibels
+            rightComponentAction: () => this.props.dispatch(addLimit)
         }));
     },
     render() {

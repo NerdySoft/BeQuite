@@ -1,28 +1,26 @@
-const INITIAL_STATE = [{
-    title: 'Test Limit',
-    decibelsValue: 10,
-    text: 'TestLimittext',
+import { pushRoute } from '../navigation/NavigationState';
 
-}];
+const initialState = [];
 
-const EDIT_LIMIT = 'LimitsState/EDIT_LIMIT';
+const ADD_LIMIT = 'LimitsState/ADD_LIMIT';
 
-export function editLimit(id) {
+export function addLimitObj(obj) {
     return {
-        type: EDIT_LIMIT,
-        payload: id
+        type: 'LimitsState/ADD_LIMIT',
+        payload: obj
     };
 }
 
+export function addLimit(dispatch) {
+        dispatch(pushRoute({key: 'EditLimit', title: `Edit Limits`, data: 'I came from Settings!'}));
+        dispatch(addLimitObj({ title: 'NEW LIMIT23', decibelsValue: 1000, text: 'some text' }));
+}
 
-export default  (state = INITIAL_STATE, action) => {
+export default function limitState(state = initialState, action) {
     switch (action.type) {
-
-        case EDIT_LIMIT: {
-            console.log("from reducer action");
-            return {...state, [action.payload.prop]: action.payload.value};
+        case ADD_LIMIT: {
+            return [...state, action.payload];
         }
-
         default:
             return state;
     }

@@ -24,7 +24,6 @@ const LimitsView = React.createClass({
     },
     render() {
         const { limits } = this.props;
-
         return (
             <View style={styles.container}>
                 { limits.map((value, index) => <TouchableOpacity onPress={this.goToEditLimits} style={styles.limitButton} title={ `${index}` } key={ `limit-${index}` }>

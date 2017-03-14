@@ -50,7 +50,7 @@ const NavigationView = React.createClass({
                     }
                     return (
                         <TouchableOpacity onPress={this.props.onNavigateBack} style={styles.backArrowTouchable}>
-                            <Icon name="angle-left" size={35} style={styles.backArrow} ></Icon>
+                            <Icon name="angle-left" size={35} style={styles.backArrow}/>
                         </TouchableOpacity>
                     )
                 }}
