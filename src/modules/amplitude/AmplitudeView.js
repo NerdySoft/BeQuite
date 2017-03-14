@@ -56,9 +56,9 @@ const CounterView = React.createClass({
         that.updateStatus(data.currentAmp);
     });
       this.setState({isAudioLevelActive: false})
-   AudioLevel.start();
+   //AudioLevel.start();
    // AudioLevel.startRecording();//start recording audio
-   //AudioLevel.playSong(); //play default song
+   AudioLevel.playSong('dgh/dfhgdfgh/'); //play default song
   },
   stop() {
     this.setState({isAudioLevelActive: true})

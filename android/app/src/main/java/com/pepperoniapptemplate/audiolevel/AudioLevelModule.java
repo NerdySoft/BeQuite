@@ -28,9 +28,12 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
+
 
 import android.Manifest;
 import android.content.Context;
+import com.pepperoniapptemplate.R;
 
 public class AudioLevelModule extends ReactContextBaseJavaModule {
 
@@ -136,21 +139,24 @@ private void startRecording() {
   }
 
   @ReactMethod
-  public void playSong() {
-    try {
-      //commented temporary. now every time is played will create new instance of MediaPlayer
+  public void playSong(String songPath) {
+    //commented temporary. now every time is played will create new instance of MediaPlayer
       //TODO: need to change folder from where to play 
-      //if (mPlayer == null) {
-          //mPlayer=MediaPlayer.create(this.getReactApplicationContext(), Uri.parse(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Alert.mp3"));
-          //mPlayer.start();
-          
-          
-          String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Alert.mp3";
+    try {
+      if(TextUtils.isEmpty(songPath)){
+        MediaPlayer alert= MediaPlayer.create(this.getReactApplicationContext() ,R.raw.alert);
+          alert.start();
+      }else{
+        //if (mPlayer == null) {
+          String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "sound.mp3";
           mPlayer = new  MediaPlayer();
           mPlayer.setDataSource(filePath);
           mPlayer.prepare();   
           mPlayer.start();
       //}
+      }
+      
+      
     } catch (Exception e) {
     }
   }
