@@ -4,7 +4,7 @@ import LimitsView from './LimitsView';
 export default connect(
     state => {
         return {
-            limits: state.getIn(['limits'])
+            limits: state.getIn(['limits']).toJS()
         }
     }
 )(LimitsView);

@@ -5,7 +5,7 @@ import { setSceneParams, popRoute } from '../../modules/navigation/NavigationSta
 export default connect(
     state => {
         return {
-            decibels: state.get('decibels')
+            decibels: state.get('decibels').toJS()
         }
     },
     dispatch => ({

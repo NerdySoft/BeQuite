@@ -9,31 +9,26 @@ import {
 
 const DecibelPickerView = React.createClass({
   propTypes: {
-    setSceneParams: PropTypes.func,
+    setSceneParams: PropTypes.func.isRequired,
     decibels: PropTypes.array.isRequired
   },
   getInitialState() {
     const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
     return { decibels: ds.cloneWithRows(this.props.decibels) }
   },
-  componentDidMount() {
-    //this.props.setSceneParams({ msg: 'Hello from DECIBELS!' });
-  },
   chooseDecibels(decibels){
-    this.props.setSceneParams({ msg: decibels });
+    this.props.setSceneParams({ decibels });
     this.props.onNavigateBack();
-
   },
   render() {
     return (
       <View style={ styles.container }>
         <ListView
             dataSource={ this.state.decibels }
-            renderRow={ value =>
+            renderRow={value =>
             <TouchableOpacity
                 onPress={() => this.chooseDecibels(value)}
                 style={styles.limitButton}>
-                {/*<Text>{ this.props.data.toString() + value }</Text>*/}
               <Text>{ value } db</Text>
             </TouchableOpacity>
             }

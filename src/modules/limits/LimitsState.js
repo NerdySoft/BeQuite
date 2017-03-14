@@ -1,6 +1,7 @@
+import { List, fromJS } from 'immutable';
 import { popRoute } from '../navigation/NavigationState';
 
-const initialState = [];
+const initialState = List([]);
 
 const SAVE_LIMIT = 'LimitsState/SAVE_LIMIT';
 
@@ -21,7 +22,8 @@ export function saveLimit(limitObj) {
 export default function limitState(state = initialState, action) {
     switch (action.type) {
         case SAVE_LIMIT: {
-            return [...state, action.payload];
+            const _state = state.toJS();
+            return fromJS([..._state, action.payload]);
         }
         default:
             return state;

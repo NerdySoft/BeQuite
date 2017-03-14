@@ -10,14 +10,14 @@ import {
 } from 'react-native';
 import * as NavigationState from '../../modules/navigation/NavigationState';
 const LimitsView = React.createClass({
-    getSaveLimitRoute(){
+    getSaveLimitRoute(limit){
         this.props.dispatch(NavigationState.pushRoute({
             key: 'EditLimit',
             title: `Edit Limits`,
-            data: { isUpdate: true },
+            data: { limit, isUpdate: true },
             showRightComponent: 'true',
             iconName: 'save',
-            rightComponentAction: ()=>this.props.dispatch(NavigationState.popRoute())
+            rightComponentAction: () => this.props.dispatch(NavigationState.popRoute())
         }));
     },
     goToEditLimits(){
@@ -27,10 +27,22 @@ const LimitsView = React.createClass({
         const { limits } = this.props;
         return (
             <View style={styles.container}>
-                { limits.map((value, index) => <TouchableOpacity onPress={this.getSaveLimitRoute} style={styles.limitButton} title={ `${index}` } key={ `limit-${index}` }>
-                    <Text style={styles.text}>{ value.title }</Text>
-                    <Text style={styles.decibelsValue}>{ value.decibelsValue } db</Text>
-                </TouchableOpacity>) }
+                {
+                    limits && limits.map((limit, index) => {
+                       const saveLimitRouteCover = () => this.getSaveLimitRoute(limit);
+
+                       return (
+                           <TouchableOpacity
+                                onPress={ saveLimitRouteCover }
+                                style={ styles.limitButton }
+                                title={ `${index}` }
+                                key={ `limit-${index}` }>
+                                <Text style={styles.text}>{ limit.title }</Text>
+                                <Text style={styles.decibels}>{ limit.decibels } DB</Text>
+                            </TouchableOpacity>
+                       );
+                    })
+                }
             </View>
         );
     }

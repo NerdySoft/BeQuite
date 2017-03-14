@@ -11,6 +11,7 @@ import {
     DeviceEventEmitter
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { generateUUID } from '../../services/identificationService';
 import { pushRoute, setRightComponentAction } from '../navigation/NavigationState';
 import { saveLimit } from '../limits/LimitsState';
 
@@ -19,51 +20,59 @@ const EditLimtsView = React.createClass({
         this.props.dispatch(pushRoute({
             key: 'Decibel',
             title: `Decibels`,
-            data: 'I came from Edit Limits View!',
-            navigateBackAction: () => {}
+            navigateBackAction: data => data && this.setState({
+                limit: { ...this.state.limit, decibels: data.decibels }
+            })
         }));
     },
     getInitialState() {
         return {
-            decibels: '0',
-            title: '',
-            message: ''
+            limit: {
+                id: generateUUID(),
+                decibels: 0,
+                title: '',
+                message: ''
+            }
         }
     },
     componentDidMount() {
         setTimeout(() => this.props.dispatch(setRightComponentAction(
-            () => this.props.dispatch(saveLimit({ title: 'BRO', text: 'TEXT', decibelsValue: 1000 }))
-        )), 1000);
+            () => this.props.dispatch(saveLimit(this.state.limit))
+        )), 300);
     },
     deleteLimit(){
-        //TODO: make function that will delete limit
+
     },
     render() {
-        const { limits, data: { isUpdate } } = this.props;
+        const { data: { isUpdate, limit } } = this.props;
+
+        if (limit) this.setState({ limit });
+
+        const _limit = this.state.limit;
 
         return (
-            <View style={styles.container}>
+            <View style={ styles.container }>
                 <TextInput
-                    placeholder="Title:"
-                    style={styles.title} />
+                    placeholder="Title"
+                    style={ styles.title }
+                    onChangeText={ title => this.setState({ limit: { ..._limit, title }})}
+                />
                 <TextInput
-                    style={styles.textmessage}
-                    placeholder="Enter text message here:"
-                    multiline = {true}
-                    numberOfLines={2}
+                    style={ styles.textmessage }
+                    placeholder="Message"
+                    multiline = { true }
+                    onChangeText={ message => this.setState({ limit: { _limit, message }})}
                 />
                 <TouchableOpacity
-                    onPress={this.goToDecibels}
+                    onPress={ this.goToDecibels }
                     style={[styles.button, this.props.isSelected && styles.selected]}>
                     <View>
-                        <Text style={styles.buttontext}>Select Sound Limit</Text>
+                        <Text style={styles.buttontext}>Sound Limit</Text>
                     </View>
                     <View style={styles.arrowAndDb}>
-                        <Text style={styles.decibelsvalue}>{this.state.decibels} DB</Text>
-                        <Icon name="angle-right" size={22} style={styles.arrowRight}></Icon>
+                        <Text style={styles.decibelsvalue}>{ this.state.decibels } DB</Text>
+                        <Icon name="angle-right" size={22} style={styles.arrowRight}/>
                     </View>
-
-
                 </TouchableOpacity>
 
                 { isUpdate && <TouchableOpacity
