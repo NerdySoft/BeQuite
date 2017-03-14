@@ -11,7 +11,16 @@ import {
 import * as NavigationState from '../../modules/navigation/NavigationState';
 const LimitsView = React.createClass({
     goToEditLimits(){
-        this.props.dispatch(NavigationState.pushRoute({key: 'EditLimit', title: `Edit Limits`}));
+        this.props.dispatch(NavigationState.pushRoute({
+            key: 'EditLimit',
+            title: `Edit Limits`,
+            data: 'I came from LimitsView!',
+            showRightComponent: 'true',
+            iconName: 'save',
+            rightComponentAction: ()=>{
+
+            }
+        }));
     },
     render() {
         const { limits } = this.props;
