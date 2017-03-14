@@ -17,10 +17,12 @@ const LimitsView = React.createClass({
         const { limits } = this.props;
         return (
             <View style={styles.container}>
-                { limits.map((value, index) => <TouchableOpacity onPress={this.goToEditLimits} style={styles.limitButton} title={ `${index}` } key={ `limit-${index}` }>
-                    <Text style={styles.text}>{ value.title }</Text>
-                    <Text style={styles.decibelsValue}>{ value.decibelsValue } db</Text>
-                </TouchableOpacity>) }
+                { limits.map((value, index) =>
+                    <TouchableOpacity onPress={this.goToEditLimits} style={styles.limitButton} title={ `${index}` } key={ `limit-${index}` }>
+                        <Text style={styles.text}>{ value.title }</Text>
+                        <Text style={styles.decibelsValue}>{ value.decibelsValue } db</Text>
+                    </TouchableOpacity>)
+                }
             </View>
         );
     }

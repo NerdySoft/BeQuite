@@ -19,7 +19,7 @@ export default React.createClass({
       <TouchableOpacity
         onPress={this.props.action}
         style={[styles.button, this.props.isSelected && styles.selected]}>
-        <Icon name={ this.props.icon } size={20} color='white' /><Text style={{ color: 'white' }}>{this.props.text}</Text>
+        <Icon name={ this.props.icon } size={20} color='white'/><Text style={{ color: 'white' }}>{this.props.text}</Text>
       </TouchableOpacity>
     );
   }

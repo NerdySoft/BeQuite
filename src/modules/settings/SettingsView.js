@@ -1,36 +1,18 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import { addLimit } from '../limits/LimitsState'
 import {
     Text,
     View,
-    StyleSheet
+    StyleSheet,
+    ListView,
+    TouchableOpacity
 } from 'react-native';
-
+import Icon from 'react-native-vector-icons/FontAwesome';
 import * as NavigationState from '../../modules/navigation/NavigationState';
 
-const color = () => Math.floor(255 * Math.random());
-
-/**
- * Sample view to demonstrate navigation patterns.
- * @TODO remove this module in a live application.
- */
-const ColorView = React.createClass({
+const SettingsView = React.createClass({
     propTypes: {
         dispatch: PropTypes.func.isRequired,
-    },
-    getInitialState() {
-        return {text: 'Tap me for going to "DECIBELS-VIEW"'}
-    },
-    goToDecibels() {
-        this.props.dispatch(NavigationState.pushRoute({
-            key: 'Decibel',
-            title: `Decibels`,
-            data: 'I came from Settings!',
-            navigateBackAction: data => this.setState({text: data.msg}),
-        }));
-    },
-    goToEditLimits(){
-        this.props.dispatch(NavigationState.pushRoute({key: 'EditLimit', title: `Edit Limits`, data: 'I came from Settings!'}));
     },
     goToLimits() {
         this.props.dispatch(NavigationState.pushRoute({
@@ -42,29 +24,44 @@ const ColorView = React.createClass({
         }));
     },
     render() {
-        const index = this.props.index;
-
         return (
-            <View style={[styles.container]}>
-                <Text onPress={this.goToDecibels}>
-                    { this.state.text }
-                </Text>
-                <Text onPress={this.goToEditLimits}>
-                    { 'Tap me for going to "EDIT-LIMITS"' }
-                </Text>
-                <Text onPress={this.goToLimits}>
-                    { 'Tap me for going to "Limits"' }
-                </Text>
+            <View style={ [styles.container] }>
+                <TouchableOpacity onPress={ this.goToLimits } style={ styles.limitButton } key={ 'limits' }>
+                    <View style={{flex: 1, flexDirection: 'row'}}>
+                        <Icon style={ styles.icon } name="volume-down" size={20} color='steelblue' />
+                        <Text style={ styles.text }>Limits</Text>
+                    </View>
+                </TouchableOpacity>
             </View>
         );
     }
 });
+
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
+    },
+    limitButton: {
+        alignSelf: 'stretch',
+        height: 70,
+        borderBottomColor: '#bbb',
+        borderBottomWidth: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        marginLeft: 10,
+        marginRight: 10
+    },
+    text: {
+        paddingLeft: 10,
+        paddingTop: 20,
+        fontSize: 20
+    },
+    icon: {
+        paddingTop: 25
+    },
+    decibelsValue: {
+        paddingLeft: 10,
+        fontSize: 15,
     }
 });
 
-export default ColorView;
+export default SettingsView;

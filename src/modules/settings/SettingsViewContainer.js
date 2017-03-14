@@ -1,4 +1,4 @@
-import {connect} from 'react-redux';
-import ColorView from './SettingsView';
+import { connect } from 'react-redux';
+import SettingsView from './SettingsView';
 
-export default connect()(ColorView);
+export default connect()(SettingsView);
