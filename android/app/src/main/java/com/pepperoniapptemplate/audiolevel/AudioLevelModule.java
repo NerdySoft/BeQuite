@@ -8,6 +8,8 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.BaseActivityEventListener;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
@@ -29,6 +31,9 @@ import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.content.Intent;
+import 	android.net.Uri;
+import android.app.Activity;
 
 
 import android.Manifest;
@@ -46,17 +51,35 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
   private static final String DownloadsDirectoryPath = "DownloadsDirectoryPath";
 
   private Context context;
-  private static MediaRecorder mRecorder = null;
-  private static MediaRecorder nRecorder = null;
-  private static MediaPlayer mPlayer = null;
-  private String currentOutputFile;
+  private static MediaRecorder mRecorder = null;//recorder to listen loud level without saving it
+  private static MediaRecorder nRecorder = null;//recorder to save audio into file
+  private static MediaPlayer mPlayer = null;//audio player
   private Timer timer;
-  private boolean isRecording = false;
-  private int recorderSecondsElapsed;
-  private static String nFileName = null;
+  private boolean isRecording = false;//not using it (yet)
+  private int recorderSecondsElapsed;//not using it (yet)
+  private static String nFileName = null;//record file name.
+
+
+  private final ActivityEventListener mActivityEventListener = new BaseActivityEventListener() {
+    @Override
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent intent) {
+          if(requestCode == 1){
+            if(resultCode == Activity.RESULT_OK){
+              Uri uri = intent.getData();
+              String path = uri.getPath();
+              WritableMap body = Arguments.createMap();
+              body.putString("fileURI", uri.toString());
+              sendEvent("chosenFleURI", body);
+            }
+          }
+        }
+  };
+  
+
 
   public AudioLevelModule(ReactApplicationContext reactContext) {
     super(reactContext);
+    reactContext.addActivityEventListener(mActivityEventListener);
   }
 
   @Override
@@ -90,11 +113,9 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
 private void startRecording() {
-        
+        //TODO: need to save file somewere else.
+        //TODO: if there is no directory file will not save and error will be thrown :(
         nFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "LastNoiseRecord.3gp";
-
-        //nFileName = getExternalCacheDir().getAbsolutePath();
-        //nFileName += "/audiorecordtest.3gp";
         nRecorder = new MediaRecorder();
 
         nRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -105,7 +126,9 @@ private void startRecording() {
         try {
             nRecorder.prepare();
         } catch (IOException e) {
-            //Log.e(LOG_TAG, "prepare() failed");
+          WritableMap body = Arguments.createMap();
+          body.putString("error", "Error in startRecording(): " + e.getMessage());
+          sendEvent("logger", body);
         }
 
         nRecorder.start();
@@ -135,6 +158,9 @@ private void startRecording() {
         }, 0, 500);
       }
     } catch (Exception e) {
+      WritableMap body = Arguments.createMap();
+      body.putString("error", "Error in start(): " + e.getMessage());
+      sendEvent("logger", body);
     }
   }
 
@@ -148,9 +174,11 @@ private void startRecording() {
           alert.start();
       }else{
         //if (mPlayer == null) {
-          String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "sound.mp3";
+          //going to change it to use android URI
+          //String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "sound.mp3";
           mPlayer = new  MediaPlayer();
-          mPlayer.setDataSource(filePath);
+          //mPlayer.setDataSource(filePath);
+          mPlayer.setDataSource(this.getReactApplicationContext(),  Uri.parse(songPath));
           mPlayer.prepare();   
           mPlayer.start();
       //}
@@ -158,6 +186,9 @@ private void startRecording() {
       
       
     } catch (Exception e) {
+              WritableMap body = Arguments.createMap();
+              body.putString("error", e.getMessage());
+              sendEvent("logger", body);
     }
   }
 
@@ -177,13 +208,13 @@ private void startRecording() {
       mRecorder.stop();
       mRecorder.release();
     } catch (final RuntimeException e) {
-      // https://developer.android.com/reference/android/media/MediaRecorder.html#stop()
-      //logAndRejectPromise(promise, "RUNTIME_EXCEPTION", "No valid audio data received. You may be using a device that can't record audio.");
+      WritableMap body = Arguments.createMap();
+      body.putString("error", "Error in stop(): " + e.getMessage());
+      sendEvent("logger", body);
       return;
     } finally {
       mRecorder = null;
     }
-    //promise.resolve(currentOutputFile);
     sendEvent("recordingFinished", null);
   }
   @ReactMethod
@@ -194,16 +225,24 @@ private void startRecording() {
       nRecorder.stop();
       nRecorder.release();
     } catch (final RuntimeException e) {
-      // https://developer.android.com/reference/android/media/MediaRecorder.html#stop()
-      //logAndRejectPromise(promise, "RUNTIME_EXCEPTION", "No valid audio data received. You may be using a device that can't record audio.");
+      WritableMap body = Arguments.createMap();
+      body.putString("error", "Error in stopRecording(): " + e.getMessage());
+      sendEvent("logger", body);
       return;
     } finally {
       nRecorder = null;
     }
-    //promise.resolve(currentOutputFile);
     sendEvent("recordingNoiseFinished", null);
   }
 
+  @ReactMethod
+  public void chooseAudio() {
+    Activity activity = getCurrentActivity();
+    Intent intent_upload = new Intent();
+    intent_upload.setType("audio/*");
+    intent_upload.setAction(Intent.ACTION_GET_CONTENT);
+    activity.startActivityForResult(intent_upload,1);
+  }
   private void sendEvent(String eventName, Object params) {
     getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName,
         params);

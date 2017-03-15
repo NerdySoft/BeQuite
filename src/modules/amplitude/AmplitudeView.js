@@ -55,10 +55,23 @@ const CounterView = React.createClass({
         that.props.dispatch(AmplitudeState.load(data.currentAmp));
         that.updateStatus(data.currentAmp);
     });
+      NativeAppEventEmitter.addListener('chosenFleURI', (data) => {
+          console.log(data.fileURI);
+          AudioLevel.playSong(data.fileURI);
+      });
+      //need to get error message from java side
+      NativeAppEventEmitter.addListener('logger', (data) => {
+
+        console.log(data.error);
+      });
+
+
       this.setState({isAudioLevelActive: false})
    //AudioLevel.start();
    // AudioLevel.startRecording();//start recording audio
-   AudioLevel.playSong('dgh/dfhgdfgh/'); //play default song
+   //AudioLevel.playSong(''); //play default song
+      //AudioLevel.playSong(fileURI); //play song by uri
+    AudioLevel.chooseAudio();
   },
   stop() {
     this.setState({isAudioLevelActive: true})
