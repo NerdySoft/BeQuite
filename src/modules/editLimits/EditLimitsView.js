@@ -5,63 +5,106 @@ import {
     Button,
     Text,
     View,
+    Alert,
     TextInput,
     NativeModules,
     NativeAppEventEmitter,
     DeviceEventEmitter
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { generateUUID } from '../../services/identificationService';
+import dismissKeyboard from 'react-native-dismiss-keyboard';
+import { generateUUID, LimitProp } from '../../services/identificationService';
 import { pushRoute, setRightComponentAction } from '../navigation/NavigationState';
-import { saveLimit } from '../limits/LimitsState';
+import { saveLimit, removeLimit } from '../limits/LimitsState';
 
 const EditLimtsView = React.createClass({
     goToDecibels() {
+        dismissKeyboard();
         this.props.dispatch(pushRoute({
             key: 'Decibel',
             title: `Decibels`,
             navigateBackAction: data => data && this.setState({
-                limit: { ...this.state.limit, decibels: data.decibels }
+                decibels: { ...this.state.decibels, value: data.decibels}
             })
         }));
     },
     getInitialState() {
-        return {
-            limit: {
-                id: generateUUID(),
-                decibels: 0,
-                title: '',
-                message: ''
-            }
-        }
+        let initialLimit = {
+            id: generateUUID(),
+            decibels: new LimitProp(0, true),
+            title: new LimitProp('', true),
+            message: new LimitProp('', false)
+        };
+        const { data: { limit } } = this.props;
+
+        if (limit) initialLimit = limit;
+
+        return initialLimit;
     },
     componentDidMount() {
         setTimeout(() => this.props.dispatch(setRightComponentAction(
-            () => this.props.dispatch(saveLimit(this.state.limit))
+            () => this.saveLimitObj()
         )), 300);
     },
-    deleteLimit(){
+    saveLimitObj() {
+        const emptyProps = [];
 
+        dismissKeyboard();
+
+        for (const prop in this.state) {
+            if (this.state.hasOwnProperty(prop)
+                && this.state[prop].isRequired && !this.state[prop].value) {
+                emptyProps.push(prop.toLocaleUpperCase());
+            }
+        }
+
+        if (emptyProps.length === 0) {
+            this.props.dispatch(saveLimit(this.state))
+        } else {
+            const message = `${ emptyProps.join(', ') } ${ emptyProps.length > 1 ? 'need' : 'needs' } to be filled`;
+            Alert.alert(
+                null,
+                message,
+                [{ text: 'OK' }],
+                { cancelable: false }
+            );
+        }
+    },
+    removeLimitObj() {
+        Alert.alert(
+            null,
+            'Do you really want to delete limit?',
+            [
+                { text: 'Cancel' },
+                { text: 'OK', onPress: () => {
+                    const id = this.state.id;
+                    this.props.dispatch(removeLimit(id));
+                }},
+            ],
+            { cancelable: false }
+        );
     },
     render() {
-        const { data: { isUpdate, limit } } = this.props;
-
-        if (limit) this.setState({ limit });
-
-        const _limit = this.state.limit;
+        const { data: { isUpdate } } = this.props;
 
         return (
             <View style={ styles.container }>
                 <TextInput
                     placeholder="Title"
                     style={ styles.title }
-                    onChangeText={ title => this.setState({ limit: { ..._limit, title }})}
+                    value={ this.state.title.value }
+                    onChangeText={ value => this.setState({
+                        title: { ...this.state.title, value }
+                    })}
                 />
                 <TextInput
                     style={ styles.textmessage }
                     placeholder="Message"
                     multiline = { true }
-                    onChangeText={ message => this.setState({ limit: { _limit, message }})}
+                    value={ this.state.message.value }
+                    onChangeText={ value => this.setState({
+                        message: { ...this.state.message, value }
+                    })}
                 />
                 <TouchableOpacity
                     onPress={ this.goToDecibels }
@@ -70,13 +113,13 @@ const EditLimtsView = React.createClass({
                         <Text style={styles.buttontext}>Sound Limit</Text>
                     </View>
                     <View style={styles.arrowAndDb}>
-                        <Text style={styles.decibelsvalue}>{ this.state.decibels } DB</Text>
+                        <Text style={styles.decibelsvalue}>{ this.state.decibels.value } DB</Text>
                         <Icon name="angle-right" size={22} style={styles.arrowRight}/>
                     </View>
                 </TouchableOpacity>
 
                 { isUpdate && <TouchableOpacity
-                    onPress={this.deleteLimit}
+                    onPress={this.removeLimitObj}
                     style={[styles.bigButton, styles.deleteButton]}>
                     <Icon name="remove" size={22} style={styles.bigButtonIcon}>
                     </Icon>

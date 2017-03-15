@@ -37,8 +37,8 @@ const LimitsView = React.createClass({
                                 style={ styles.limitButton }
                                 title={ `${index}` }
                                 key={ `limit-${index}` }>
-                                <Text style={styles.text}>{ limit.title }</Text>
-                                <Text style={styles.decibels}>{ limit.decibels } DB</Text>
+                                <Text style={styles.text}>{ limit.title.value }</Text>
+                                <Text style={styles.decibels}>{ limit.decibels.value } DB</Text>
                             </TouchableOpacity>
                        );
                     })
