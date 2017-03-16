@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 
 var AudioLevel  = NativeModules.AudioLevel;
+let amplitudeQueue = new Array(60).fill(0);
 
 const CounterView = React.createClass({
   propTypes: {
@@ -20,7 +21,8 @@ const CounterView = React.createClass({
     loading: PropTypes.bool.isRequired,
     loaded: PropTypes.bool.isRequired,
     intervId: PropTypes.number,
-    dispatch: PropTypes.func.isRequired
+    dispatch: PropTypes.func.isRequired,
+    limits: PropTypes.array.isRequired
   },
   getInitialState() {
       return {
@@ -65,6 +67,17 @@ const CounterView = React.createClass({
       NativeAppEventEmitter.addListener('recordingProgress', (data) => {
         that.props.dispatch(AmplitudeState.load(data.currentAmp));
         that.updateStatus(data.currentAmp);
+        this.processAmplitude(data.currentAmp)
+            .then(avg=>{
+            //TODO: compare avg with audio levels and play song
+                let songURI = '';
+
+                if(avg > 5000){
+                    AudioLevel.playSong(songURI);
+                    amplitudeQueue.fill(0);
+                }
+                //AudioLevel.playSong(fileURI);
+            })
       });
       NativeAppEventEmitter.addListener('chosenFleURI', (data) => {
         console.log(data.fileURI);
@@ -84,6 +97,12 @@ const CounterView = React.createClass({
       //AudioLevel.playSong(fileURI); //play song by uri
       //AudioLevel.chooseAudio();
     }
+
+  },
+  async processAmplitude(newAmpValue){
+      amplitudeQueue.push(newAmpValue);
+      amplitudeQueue.shift();
+      return amplitudeQueue.reduce((total, current) => total + current, 0) / amplitudeQueue.length;
   },
   stop() {
     if (this.state.mounted) {

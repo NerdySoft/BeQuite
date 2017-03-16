@@ -12,12 +12,13 @@ import {
     DeviceEventEmitter
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import dismissKeyboard from 'react-native-dismiss-keyboard';
+//import dismissKeyboard from 'react-native-dismiss-keyboard';
 import { generateUUID, LimitProp } from '../../services/mainService';
 import { pushRoute, setRightComponentAction } from '../navigation/NavigationState';
 import { saveLimit, removeLimit } from '../limits/LimitsState';
 
 const AudioLevel  = NativeModules.AudioLevel;
+const dismissKeyboard = require('dismissKeyboard');
 
 const EditLimtsView = React.createClass({
     goToDecibels() {
