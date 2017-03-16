@@ -1,5 +1,4 @@
 import * as AmplitudeState from './AmplitudeState';
-import * as NavigationState from '../../modules/navigation/NavigationState';
 import React, {PropTypes} from 'react';
 import {
   StyleSheet,
@@ -11,9 +10,10 @@ import {
   NativeAppEventEmitter,
   DeviceEventEmitter
 } from 'react-native';
+import { fromDecibels } from '../../services/mainService';
 
 var AudioLevel  = NativeModules.AudioLevel;
-let amplitudeQueue = new Array(60).fill(0);
+let amplitudeQueue = new Array(30).fill(0);
 
 const CounterView = React.createClass({
   propTypes: {
@@ -61,31 +61,45 @@ const CounterView = React.createClass({
       }
   },
   start() {
+    AudioLevel.playSong('content://com.android.providers.media.documents/document/audio%3A43');
+    return;
+
+
     if (this.state.mounted) {
       const that = this;
 
       NativeAppEventEmitter.addListener('recordingProgress', (data) => {
-        that.props.dispatch(AmplitudeState.load(data.currentAmp));
-        that.updateStatus(data.currentAmp);
-        this.processAmplitude(data.currentAmp)
-            .then(avg=>{
-            //TODO: compare avg with audio levels and play song
-                let songURI = '';
+        const decibels = parseInt(fromDecibels(data.currentAmp));
 
-                if(avg > 5000){
-                    AudioLevel.playSong(songURI);
-                    amplitudeQueue.fill(0);
-                }
-                //AudioLevel.playSong(fileURI);
-            })
+        that.props.dispatch(AmplitudeState.load(decibels));
+        that.updateStatus(data.currentAmp);
+        this.processAmplitude(data.currentAmp).then(avg => {
+          const decibels = fromDecibels(avg);
+          const limit = this.findLimit(decibels);
+
+          console.log('decibels', decibels, limit);
+
+          if(limit){
+              const audioUri = limit.audio.value || '';
+            console.log(audioUri);
+            debugger;
+              AudioLevel.playSong(audioUri);
+            amplitudeQueue.fill(0);//ohiho
+              // this.stop();
+          }
+        });
       });
-      NativeAppEventEmitter.addListener('chosenFleURI', (data) => {
-        console.log(data.fileURI);
+
+      /*NativeAppEventEmitter.addListener('playerFinished', () => {
+          this.start();
+      });*/
+
+      /*NativeAppEventEmitter.addListener('chosenFleURI', (data) => {
         AudioLevel.playSong(data.fileURI);
-      });
+      });*/
+
       //need to get error message from java side
       NativeAppEventEmitter.addListener('logger', (data) => {
-
         console.log(data.error);
       });
 
@@ -99,17 +113,22 @@ const CounterView = React.createClass({
     }
 
   },
-  async processAmplitude(newAmpValue){
+  async processAmplitude(newAmpValue) {
       amplitudeQueue.push(newAmpValue);
       amplitudeQueue.shift();
+
       return amplitudeQueue.reduce((total, current) => total + current, 0) / amplitudeQueue.length;
+  },
+  findLimit(decibels) {
+    return this.props.limits.filter(limit => parseInt(limit.decibels.value) < decibels).pop();
   },
   stop() {
     if (this.state.mounted) {
-      // this.setState({isAudioLevelActive: true});
       AudioLevel.stop();
-      // AudioLevel.stopRecording() //stop recording audio
+      amplitudeQueue.fill(0);
 
+      // this.setState({isAudioLevelActive: true});
+      // AudioLevel.stopRecording() //stop recording audio
       //this.setState({ status: '' });
 
       return this.props.dispatch(AmplitudeState.reset());

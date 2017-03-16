@@ -208,8 +208,8 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
     //TODO: need to change folder from where to play
     try {
       if (TextUtils.isEmpty(songPath)) {
-        MediaPlayer alert = MediaPlayer.create(this.getReactApplicationContext(), R.raw.alert);
-        alert.start();
+        mPlayer = MediaPlayer.create(this.getReactApplicationContext(), R.raw.alert);
+        //mPlayer.start();
       } else {
         //if (mPlayer == null) {
         //going to change it to use android URI
@@ -217,10 +217,22 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
         mPlayer = new MediaPlayer();
         //mPlayer.setDataSource(filePath);
         mPlayer.setDataSource(this.getReactApplicationContext(), Uri.parse(songPath));
+        //TODO: if song not exists
         mPlayer.prepare();
-        mPlayer.start();
+        //mPlayer.start();
         //}
       }
+
+      mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        public void onCompletion(MediaPlayer mp) {
+          //promise.resolve(path);
+          mPlayer.stop();
+          mPlayer.release();
+          mPlayer = null;
+          sendEvent("playerFinished", null);
+        }
+      });
+      mPlayer.start();
 
     } catch (Exception e) {
       WritableMap body = Arguments.createMap();

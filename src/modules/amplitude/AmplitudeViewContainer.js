@@ -7,6 +7,6 @@ export default connect(
     loading: state.getIn(['amplitude', 'loading']),
     loaded: state.getIn(['amplitude', 'loaded']),
     intervId: state.getIn(['amplitude', 'intervId']),
-    limits: state.getIn(['limits'])
+    limits: state.getIn(['limits']).toJS()
   })
 )(CounterView);
