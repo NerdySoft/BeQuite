@@ -13,9 +13,11 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import dismissKeyboard from 'react-native-dismiss-keyboard';
-import { generateUUID, LimitProp } from '../../services/identificationService';
+import { generateUUID, LimitProp } from '../../services/mainService';
 import { pushRoute, setRightComponentAction } from '../navigation/NavigationState';
 import { saveLimit, removeLimit } from '../limits/LimitsState';
+
+const AudioLevel  = NativeModules.AudioLevel;
 
 const EditLimtsView = React.createClass({
     goToDecibels() {
@@ -33,7 +35,8 @@ const EditLimtsView = React.createClass({
             id: generateUUID(),
             decibels: new LimitProp(0, true),
             title: new LimitProp('', true),
-            message: new LimitProp('', false)
+            message: new LimitProp('', false),
+            audio: new LimitProp('', false)
         };
         const { data: { limit } } = this.props;
 
@@ -45,6 +48,13 @@ const EditLimtsView = React.createClass({
         setTimeout(() => this.props.dispatch(setRightComponentAction(
             () => this.saveLimitObj()
         )), 300);
+        NativeAppEventEmitter.addListener('chosenFleURI', (data) => {
+            this.setState({ audio: {
+                ...this.state.audio,
+                value: data.fileURI,
+                title: data.fileName
+            }});
+        });
     },
     saveLimitObj() {
         const emptyProps = [];
@@ -84,6 +94,9 @@ const EditLimtsView = React.createClass({
             { cancelable: false }
         );
     },
+    chooseAudio() {
+        AudioLevel.chooseAudio();
+    },
     render() {
         const { data: { isUpdate } } = this.props;
 
@@ -115,6 +128,13 @@ const EditLimtsView = React.createClass({
                     <View style={styles.arrowAndDb}>
                         <Text style={styles.decibelsvalue}>{ this.state.decibels.value } DB</Text>
                         <Icon name="angle-right" size={22} style={styles.arrowRight}/>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={ this.chooseAudio }
+                    style={ styles.button }>
+                    <View>
+                        <Text style={styles.buttontext}>{ this.state.audio.title || 'Sound Alert' }</Text>
                     </View>
                 </TouchableOpacity>
 

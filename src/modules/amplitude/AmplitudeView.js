@@ -30,8 +30,16 @@ const CounterView = React.createClass({
           high: 12000
         },
         status: 'Click \'Start\' to measure noise',
-        isAudioLevelActive: true
+        mounted: false,
+        /*isAudioLevelActive: true*/
       }
+  },
+  componentDidMount() {
+    this.setState({ mounted:  true });
+  },
+  componentWillUnmount() {
+    this.stop();
+    this.setState({ mounted:  false });
   },
   updateStatus(amp) {
     const levels = this.state.levels;
@@ -46,18 +54,21 @@ const CounterView = React.createClass({
       else if (amp > levels.high)
         status = 'What the hell is that, shut up everybody!';
 
-      this.setState({ status: status });
+      if (this.state.mounted) {
+        this.setState({status: status});
+      }
   },
   start() {
-    const that = this;
+    if (this.state.mounted) {
+      const that = this;
 
-    NativeAppEventEmitter.addListener('recordingProgress', (data) => {
+      NativeAppEventEmitter.addListener('recordingProgress', (data) => {
         that.props.dispatch(AmplitudeState.load(data.currentAmp));
         that.updateStatus(data.currentAmp);
-    });
+      });
       NativeAppEventEmitter.addListener('chosenFleURI', (data) => {
-          console.log(data.fileURI);
-          AudioLevel.playSong(data.fileURI);
+        console.log(data.fileURI);
+        AudioLevel.playSong(data.fileURI);
       });
       //need to get error message from java side
       NativeAppEventEmitter.addListener('logger', (data) => {
@@ -66,21 +77,24 @@ const CounterView = React.createClass({
       });
 
 
-      this.setState({isAudioLevelActive: false})
-   //AudioLevel.start();
-   // AudioLevel.startRecording();//start recording audio
-   //AudioLevel.playSong(''); //play default song
+      // this.setState({isAudioLevelActive: false});
+      AudioLevel.start();
+      //AudioLevel.startRecording();//start recording audio
+      //AudioLevel.playSong(''); //play default song
       //AudioLevel.playSong(fileURI); //play song by uri
-    AudioLevel.chooseAudio();
+      //AudioLevel.chooseAudio();
+    }
   },
   stop() {
-    this.setState({isAudioLevelActive: true})
-    AudioLevel.stop();
-    //AudioLevel.stopRecording() //stop recording audio
+    if (this.state.mounted) {
+      // this.setState({isAudioLevelActive: true});
+      AudioLevel.stop();
+      // AudioLevel.stopRecording() //stop recording audio
 
-    this.setState({ status: '' });
+      //this.setState({ status: '' });
 
-    return this.props.dispatch(AmplitudeState.reset());
+      return this.props.dispatch(AmplitudeState.reset());
+    }
   },
   render() {
     const loadingStyle = this.props.loading
@@ -107,13 +121,11 @@ const CounterView = React.createClass({
 
         <View style={styles.btnsContainer}>
             <Button onPress={this.start}
-                disabled={!isAudioLevelActive}
                 title="Start"
                 color="steelblue"
                 accessibilityLabel="Start"
               />
             <Button onPress={this.stop}
-              disabled={isAudioLevelActive}
               title="Stop"
               color="steelblue"
               accessibilityLabel="Stop"

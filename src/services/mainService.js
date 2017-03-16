@@ -18,3 +18,5 @@ export function LimitProp(value, isRequired) {
   this.value = value;
   this.isRequired = isRequired;
 }
+
+// export function
