@@ -1,5 +1,4 @@
-import * as AmplitudeState from './AmplitudeState';
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -10,10 +9,11 @@ import {
   NativeAppEventEmitter,
   DeviceEventEmitter
 } from 'react-native';
+import * as AmplitudeState from './AmplitudeState';
 import { fromDecibels } from '../../services/mainService';
 
-var AudioLevel  = NativeModules.AudioLevel;
-let amplitudeQueue = []//new Array(30).fill(0);
+const AudioLevel = NativeModules.AudioLevel;
+let amplitudeQueue = [];
 
 const CounterView = React.createClass({
   propTypes: {
@@ -26,138 +26,91 @@ const CounterView = React.createClass({
   },
   getInitialState() {
       return {
-        levels: {
-          low: 2000,
-          medium: 8000,
-          high: 12000
-        },
         status: 'Click \'Start\' to measure noise',
-        mounted: false,
-        /*isAudioLevelActive: true*/
+        isAudioLevelActive: false,
+        isAudioStarted: false,
       }
   },
+  updateStatus(status) {
+      this.setState({ status });
+  },
   componentDidMount() {
-    this.setState({ mounted:  true });
-
       const that = this;
+
       NativeAppEventEmitter.addListener('recordingProgress', (data) => {
           const decibels = parseInt(fromDecibels(data.currentAmp));
 
           that.props.dispatch(AmplitudeState.load(decibels));
-          that.updateStatus(data.currentAmp);
-          console.log('====================================================currentAmp', data.currentAmp);
-          this.processAmplitude(data.currentAmp).then(avg => {
-              console.log('================================================avg', avg);
+          that.processAmplitude(data.currentAmp).then(avg => {
               const decibels = fromDecibels(avg);
-              const limit = this.findLimit(decibels);
-
-              console.log('decibels', decibels, limit);
+              const limit = that.findLimit(decibels);
 
               if(limit){
-                  const audioUri = limit.audio.value || '';
-                  console.log(audioUri);
-                  //debugger;
-                  amplitudeQueue =[];
-                  console.log('=======================================================-------amplitude.length', amplitudeQueue.length);
-                  AudioLevel.playSong(audioUri);
-                  //amplitudeQueue =[]//.fill(0);//ohiho
-                  that.stop();
+                const audioUri = limit.audio.value || '';
+                that.stop();
+                this.updateStatus(limit.message.value);
+                AudioLevel.playSong(audioUri);
               }
           });
       });
 
-      NativeAppEventEmitter.addListener('playerFinished', () => {
-          this.start();
-      });
-
-
-      NativeAppEventEmitter.addListener('chosenFleURI', (data) => {
-          //AudioLevel.playSong(data.fileURI);
-      });
-
-      //need to get error message from java side
-      NativeAppEventEmitter.addListener('logger', (data) => {
-          console.log('================================================================ ', data.error);
-      });
-
-      NativeAppEventEmitter.addListener('getAudioDuration', (duration) => {
-          console.log('duration: ', duration.duration)
-      });
-
-
-
+      NativeAppEventEmitter.addListener('playerFinished', () => this.start());
+      NativeAppEventEmitter.addListener('logger', (data) => console.error(data.error));
   },
   componentWillUnmount() {
-      NativeAppEventEmitter.removeAllListeners();
+    NativeAppEventEmitter.removeAllListeners();
     this.stop();
-    this.setState({ mounted:  false });
-  },
-  updateStatus(amp) {
-    const levels = this.state.levels;
-    let status;
-
-      if (amp <= levels.low)
-        status = 'Very quiet and calm family';
-      else if (amp > levels.low && amp <= levels.medium)
-        status = 'Look, that boy opened mouth';
-      else if (amp > levels.medium && amp <= levels.high)
-        status = 'Hey Peter, dress down that b*tch!';
-      else if (amp > levels.high)
-        status = 'What the hell is that, shut up everybody!';
-
-      if (this.state.mounted) {
-        this.setState({status: status});
-      }
   },
   start() {
-    //AudioLevel.playSong('content://com.android.providers.media.documents/document/audio%3A43');
-    //return;
-
-
-    if (this.state.mounted) {
-
-
-      // this.setState({isAudioLevelActive: false});
-      AudioLevel.start();
-      //AudioLevel.startRecording();//start recording audio
-      //AudioLevel.playSong(''); //play default song
-      //AudioLevel.playSong(fileURI); //play song by uri
-      //AudioLevel.chooseAudio();
+    // AudioLevel.startRecording();
+    AudioLevel.start();
+    this.setState({
+      isAudioStarted: true,
+      isAudioLevelActive: true,
+      status: 'Listening...'
+    });
+  },
+  stop(isForsed) {
+    if (isForsed) {
+      this.setState({ isAudioStarted: false });
     }
 
+    // AudioLevel.stopRecording();
+    AudioLevel.stop();
+    amplitudeQueue = [];
+    this.setState({ isAudioLevelActive: false, status: '' });
+
+    return this.props.dispatch(AmplitudeState.reset());
   },
   async processAmplitude(newAmpValue) {
-      amplitudeQueue.push(newAmpValue);
-      console.log('====================================================================amplitude.length', amplitudeQueue.length);
-      if(amplitudeQueue.length === 31){
-          amplitudeQueue.shift();
-          return amplitudeQueue.reduce((total, current) => total + current, 0) / amplitudeQueue.length;
-      }
-      return 0;
+    amplitudeQueue.push(newAmpValue);
+
+    if(amplitudeQueue.length === 10){
+      amplitudeQueue.shift();
+      return amplitudeQueue.reduce((total, current) => total + current, 0) / amplitudeQueue.length;
+    }
+
+    return 0;
   },
   findLimit(decibels) {
-    return this.props.limits.filter(limit => parseInt(limit.decibels.value) < decibels).pop();
-  },
-  stop() {
-    if (this.state.mounted) {
-      AudioLevel.stop();
-      //amplitudeQueue.fill(0);
-      amplitudeQueue = [];
+    let max = 0;
+    let position = -1;
 
-      // this.setState({isAudioLevelActive: true});
-      // AudioLevel.stopRecording() //stop recording audio
-      //this.setState({ status: '' });
+    this.props.limits.forEach((limit, index) => {
+      const val = parseInt(limit.decibels.value);
 
-      return this.props.dispatch(AmplitudeState.reset());
-    }
+      if (val < decibels && val > max) {
+        max = val;
+        position = index;
+      }
+    });
+
+    return position >= 0 ? this.props.limits[position] : null;
   },
   render() {
     const loadingStyle = this.props.loading
-      ? {backgroundColor: '#eee'}
-      : null;
-      const isAudioLevelActive = this.state.isAudioLevelActive;
-    //const isAudioLevelActive = this.props.loaded;
-    const statusMessage = this.state.status;
+      ? {backgroundColor: '#eee'} : null;
+    const { isAudioLevelActive, isAudioStarted, status } = this.state;
 
     return (
       <View style={styles.container}>
@@ -171,17 +124,19 @@ const CounterView = React.createClass({
         </TouchableOpacity>
 
         <Text >
-          { statusMessage }
+          { status }
         </Text>
 
         <View style={styles.btnsContainer}>
             <Button onPress={this.start}
                 title="Start"
+                disabled={ isAudioStarted }
                 color="steelblue"
                 accessibilityLabel="Start"
               />
-            <Button onPress={this.stop}
+            <Button onPress={ () => this.stop(true) }
               title="Stop"
+              disabled={ !isAudioLevelActive }
               color="steelblue"
               accessibilityLabel="Stop"
             />

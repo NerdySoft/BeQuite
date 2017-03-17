@@ -44,4 +44,4 @@ const PepperoniAppTemplate = React.createClass({
   }
 });
 
-AppRegistry.registerComponent('PepperoniAppTemplate', () => PepperoniAppTemplate);
+AppRegistry.registerComponent('BeQuite', () => PepperoniAppTemplate);
