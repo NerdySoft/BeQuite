@@ -7,13 +7,18 @@ import {
   View,
   NativeModules,
   NativeAppEventEmitter,
-  DeviceEventEmitter
+  DeviceEventEmitter,
+  Animated,
+  Image,
+  Easing
 } from 'react-native';
 import * as AmplitudeState from './AmplitudeState';
 import { fromDecibels } from '../../services/mainService';
 
 const AudioLevel = NativeModules.AudioLevel;
 let amplitudeQueue = [];
+
+let animation = null;
 
 const CounterView = React.createClass({
   propTypes: {
@@ -25,6 +30,9 @@ const CounterView = React.createClass({
     limits: PropTypes.array.isRequired
   },
   getInitialState() {
+      this.spinValue = new Animated.Value(0);
+      this.springValue = new Animated.Value(0.3);
+
       return {
         status: 'Click \'Start\' to measure noise',
         isAudioLevelActive: false,
@@ -32,10 +40,33 @@ const CounterView = React.createClass({
       }
   },
   updateStatus(status) {
-      this.setState({ status });
+    this.setState({ status });
+  },
+  spring () {
+    this.springValue.setValue(0.3)
+    animation = Animated.spring(
+        this.springValue,
+        {
+            toValue: 1,
+            friction: 1
+        }
+    ).start(() => this.spring())
+  },
+  spin () {
+    this.spinValue.setValue(0);
+    Animated.timing(
+        this.spinValue,
+        {
+            toValue: 1,
+            duration: 4000,
+            easing: Easing.linear
+        }
+    ).start(() => this.spin())
   },
   componentDidMount() {
       const that = this;
+
+      this.spring();
 
       NativeAppEventEmitter.addListener('recordingProgress', (data) => {
           const decibels = parseInt(fromDecibels(data.currentAmp));
@@ -62,13 +93,14 @@ const CounterView = React.createClass({
     this.stop();
   },
   start() {
+      Animated.spring.stopAnimation();
     // AudioLevel.startRecording();
-    AudioLevel.start();
+    /*AudioLevel.start();
     this.setState({
       isAudioStarted: true,
       isAudioLevelActive: true,
       status: 'Listening...'
-    });
+    });*/
   },
   stop(isForsed) {
     if (isForsed) {
@@ -111,9 +143,20 @@ const CounterView = React.createClass({
     const loadingStyle = this.props.loading
       ? {backgroundColor: '#eee'} : null;
     const { isAudioLevelActive, isAudioStarted, status } = this.state;
+      const spin = this.spinValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: ['0deg', '360deg']
+      })
+
 
     return (
       <View style={styles.container}>
+          <View>
+              <Animated.Image
+                  style={{ width: 227, height: 200, transform: [{ scale: this.springValue }] }}
+                  source={{uri: 'https://s3.amazonaws.com/media-p.slid.es/uploads/alexanderfarennikov/images/1198519/reactjs.png'}}
+              />
+          </View>
         <TouchableOpacity
           accessible={true}
           accessibilityLabel={'Amplitude'}
