@@ -1,4 +1,4 @@
-package com.pepperoniapptemplate.audiolevel;
+package com.bequite.audiolevel;
 
 //TODO: remove unused imports
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -42,7 +42,7 @@ import android.media.RingtoneManager;
 
 import android.Manifest;
 import android.content.Context;
-import com.pepperoniapptemplate.R;
+import com.bequite.R;
 
 public class AudioLevelModule extends ReactContextBaseJavaModule {
 

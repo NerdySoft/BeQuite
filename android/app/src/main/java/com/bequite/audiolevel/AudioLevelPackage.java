@@ -1,4 +1,4 @@
-package com.pepperoniapptemplate.audiolevel;
+package com.bequite.audiolevel;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
