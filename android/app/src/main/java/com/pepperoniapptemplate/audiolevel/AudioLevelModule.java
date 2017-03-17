@@ -46,25 +46,32 @@ import com.pepperoniapptemplate.R;
 
 public class AudioLevelModule extends ReactContextBaseJavaModule {
 
-  private static final String DocumentDirectoryPath = "DocumentDirectoryPath";
-  private static final String PicturesDirectoryPath = "PicturesDirectoryPath";
-  private static final String MainBundlePath = "MainBundlePath";
-  private static final String CachesDirectoryPath = "CachesDirectoryPath";
-  private static final String LibraryDirectoryPath = "LibraryDirectoryPath";
-  private static final String MusicDirectoryPath = "MusicDirectoryPath";
-  private static final String DownloadsDirectoryPath = "DownloadsDirectoryPath";
+  private  final String DocumentDirectoryPath = "DocumentDirectoryPath";
+  private  final String PicturesDirectoryPath = "PicturesDirectoryPath";
+  private  final String MainBundlePath = "MainBundlePath";
+  private  final String CachesDirectoryPath = "CachesDirectoryPath";
+  private  final String LibraryDirectoryPath = "LibraryDirectoryPath";
+  private  final String MusicDirectoryPath = "MusicDirectoryPath";
+  private  final String DownloadsDirectoryPath = "DownloadsDirectoryPath";
 
   private Context context;
-  private static MediaRecorder mRecorder = null;//recorder to listen loud level without saving it
-  private static MediaRecorder nRecorder = null;//recorder to save audio into file
-  private static MediaPlayer mPlayer = null;//audio player
+  private  MediaRecorder mRecorder = null;//recorder to listen loud level without saving it
+  private  MediaRecorder nRecorder = null;//recorder to save audio into file
+  private  MediaPlayer mPlayer = null;//audio player
   private Timer timer;
   private boolean isRecording = false;//
   private boolean isListeningNoise = false;//
   private int recorderSecondsElapsed;//not using it (yet)
-  private static String nFileName = null;//record file name.
+  private  String nFileName = null;//record file name.
 
   private final ActivityEventListener mActivityEventListener = new BaseActivityEventListener() {
+
+
+
+
+
+
+
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent intent) {
       if (requestCode == 1) {
@@ -73,6 +80,7 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
           File f = new File("" + uri);
           String path = uri.getPath();
           WritableMap body = Arguments.createMap();
+
 
           String fileName = "";
           if (uri.getScheme().equals("file")) {
@@ -219,19 +227,25 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
         mPlayer.setDataSource(this.getReactApplicationContext(), Uri.parse(songPath));
         //TODO: if song not exists
         mPlayer.prepare();
+        int duration = mPlayer.getDuration();
+
+        WritableMap body = Arguments.createMap();
+        body.putInt("duration", duration);
+        sendEvent("getAudioDuration", body);
         //mPlayer.start();
+
         //}
       }
 
-      mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-        public void onCompletion(MediaPlayer mp) {
-          //promise.resolve(path);
-          mPlayer.stop();
-          mPlayer.release();
-          mPlayer = null;
-          sendEvent("playerFinished", null);
-        }
-      });
+       mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+         public void onCompletion(MediaPlayer mp) {
+           //promise.resolve(path);
+           mPlayer.stop();
+           mPlayer.release();
+           mPlayer = null;
+           sendEvent("playerFinished", null);
+         }
+       });
       mPlayer.start();
 
     } catch (Exception e) {
@@ -255,8 +269,10 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
     isListeningNoise = false;
     stopTimer();
     try {
-      mRecorder.stop();
-      mRecorder.release();
+      if (mRecorder != null) {
+        mRecorder.stop();
+        mRecorder.release();
+      }
     } catch (final RuntimeException e) {
       WritableMap body = Arguments.createMap();
       body.putString("error", "Error in stop(): " + e.getMessage());
@@ -265,7 +281,8 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
     } finally {
       mRecorder = null;
     }
-    sendEvent("recordingFinished", null);
+    //System.gc();
+    sendEvent("recordingNoiseFinished", null);
   }
 
   @ReactMethod
@@ -284,7 +301,7 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
     } finally {
       nRecorder = null;
     }
-    sendEvent("recordingNoiseFinished", null);
+    sendEvent("recordingFinished", null);
   }
 
   @ReactMethod
