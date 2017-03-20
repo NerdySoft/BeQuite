@@ -7,6 +7,8 @@ import DecibelPickerContainer from './decibelPicker/DecibelPickerViewContainer';
 
 import LimitsViewContainer from './limits/LimitsViewContainer';
 import EditLimitContainer from './editLimits/EditLimitsViewContainer';
+import MicrophoneCalibrationContainer from './microphoneCalibration/MicrophoneCalibrationContainer';
+
 
 /**
  * AppRouter is responsible for mapping a navigator scene to a view
@@ -32,6 +34,9 @@ export default function AppRouter(props) {
 
   if (key === 'Settings') {
     return <SettingsViewContainer/>;
+  }
+  if(key === 'MicCalibration'){
+    return <MicrophoneCalibrationContainer/>
   }
 
   throw new Error('Unknown navigation key: ' + key);

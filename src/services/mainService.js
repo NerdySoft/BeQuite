@@ -19,6 +19,6 @@ export function LimitProp(value, isRequired) {
   this.isRequired = isRequired;
 }
 
-export function fromDecibels(value) {
-  return (20 * Math.log10(value / 135));
+export function fromDecibels(value, correction = 0) {
+  return (20 * Math.log10(value) + correction);
 }

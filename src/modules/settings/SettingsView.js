@@ -1,15 +1,12 @@
 import React, { PropTypes } from 'react';
 
 import {
-    Text,
     View,
     StyleSheet,
-    ListView,
-    TouchableOpacity
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { saveLimit } from '../limits/LimitsState'
 import { pushRoute } from '../navigation/NavigationState';
+import SettingsItem from '../../components/SettingsItem';
 
 const SettingsView = React.createClass({
     propTypes: {
@@ -31,15 +28,19 @@ const SettingsView = React.createClass({
             }))
         }));
     },
+    goToCalibration(){
+        this.props.dispatch(pushRoute({
+            key: 'MicCalibration',
+            title: `Microphone calibration`,
+            showRightComponent: 'true',
+            iconName: 'save',
+        }));
+    },
     render() {
         return (
             <View style={ [styles.container] }>
-                <TouchableOpacity onPress={ this.goToLimits } style={ styles.limitButton } key={ 'limits' }>
-                    <View style={{flex: 1, flexDirection: 'row'}}>
-                        <Icon style={ styles.icon } name="volume-down" size={20} color='steelblue' />
-                        <Text style={ styles.text }>Limits</Text>
-                    </View>
-                </TouchableOpacity>
+                <SettingsItem onPress={ this.goToLimits } keyProp={ 'limits' } icon="volume-down" text="Limits"/>
+                <SettingsItem onPress={ this.goToCalibration } keyProp={ 'calibration' } icon="microphone" text="Microphone calibration"/>
             </View>
         );
     }
@@ -48,27 +49,6 @@ const SettingsView = React.createClass({
 const styles = StyleSheet.create({
     container: {
         flex: 1
-    },
-    limitButton: {
-        alignSelf: 'stretch',
-        height: 70,
-        borderBottomColor: '#bbb',
-        borderBottomWidth: 1,
-        justifyContent: 'center',
-        marginLeft: 10,
-        marginRight: 10
-    },
-    text: {
-        paddingLeft: 10,
-        paddingTop: 20,
-        fontSize: 20
-    },
-    icon: {
-        paddingTop: 25
-    },
-    decibelsValue: {
-        paddingLeft: 10,
-        fontSize: 15,
     }
 });
 
