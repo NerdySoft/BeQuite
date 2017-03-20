@@ -67,11 +67,11 @@ const CounterView = React.createClass({
         const that = this;
 
         NativeAppEventEmitter.addListener('recordingProgress', (data) => {
-            const decibels = parseInt(fromDecibels(data.currentAmp));
+            const decibels = parseInt(fromDecibels(data.currentAmp, that.props.correction));
 
             that.props.dispatch(AmplitudeState.load(decibels));
             that.processAmplitude(data.currentAmp).then(avg => {
-                const decibels = fromDecibels(avg);
+                const decibels = fromDecibels(avg, that.props.correction);
                 const limit = that.findLimit(decibels);
 
                 if (limit) {
@@ -125,7 +125,7 @@ const CounterView = React.createClass({
     async processAmplitude(newAmpValue) {
         amplitudeQueue.push(newAmpValue);
 
-        if (amplitudeQueue.length === 10) {
+        if (amplitudeQueue.length === 31) {
             amplitudeQueue.shift();
             return amplitudeQueue.reduce((total, current) => total + current, 0) / amplitudeQueue.length;
         }
