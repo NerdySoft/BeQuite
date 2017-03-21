@@ -71,12 +71,12 @@ gradle.projectsEvaluated {
 
                 // Set up dev mode
                 def devEnabled = !targetName.toLowerCase().contains("release")
-                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    commandLine "cmd", "/c", "node", "node_modules/react-native/local-cli/cli.js", "bundle", "--platform", "android", "--dev", "${devEnabled}",
-                            "--entry-file", entryFile, "--bundle-output", jsBundleFile, "--assets-dest", resourcesDir
+				if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                         commandLine "cmd", "/c", "react-native", "bundle", "--platform", "android", "--dev", "true", "--entry-file",
+                            entryFile, "--bundle-output", jsBundleFileDebug, "--assets-dest", resourcesDirDebug
                 } else {
-                    commandLine "node", "node_modules/react-native/local-cli/cli.js", "bundle", "--platform", "android", "--dev", "${devEnabled}",
-                            "--entry-file", entryFile, "--bundle-output", jsBundleFile, "--assets-dest", resourcesDir
+                        commandLine "react-native", "bundle", "--platform", "android", "--dev", "true", "--entry-file",
+                              entryFile, "--bundle-output", jsBundleFileDebug, "--assets-dest", resourcesDirDebug
                 }
 
                 enabled config."bundleIn${targetName}" ||

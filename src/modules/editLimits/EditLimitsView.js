@@ -37,7 +37,8 @@ const EditLimtsView = React.createClass({
             decibels: new LimitProp(0, true),
             title: new LimitProp('', true),
             message: new LimitProp('', false),
-            audio: new LimitProp('', false)
+            audio: new LimitProp('', false),
+            image: new LimitProp('', true)
         };
         const { data: { limit } } = this.props;
 
@@ -50,11 +51,20 @@ const EditLimtsView = React.createClass({
             () => this.saveLimitObj()
         )), 300);
         NativeAppEventEmitter.addListener('chosenFleURI', (data) => {
-            this.setState({ audio: {
-                ...this.state.audio,
-                value: data.fileURI,
-                title: data.fileName
-            }});
+            if(data.fileType == 1){
+                this.setState({ audio: {
+                    ...this.state.audio,
+                    value: data.fileURI,
+                    title: data.fileName
+                }});
+            }else if(data.fileType == 2){
+                console.log('Here');
+                this.setState({ image: {
+                    ...this.state.image,
+                    value: data.fileURI,
+                    title: data.fileName.substring(0, data.fileName.lastIndexOf('.'))
+                }});
+            }
         });
     },
     saveLimitObj() {
@@ -96,7 +106,10 @@ const EditLimtsView = React.createClass({
         );
     },
     chooseAudio() {
-        AudioLevel.chooseAudio();
+        AudioLevel.chooseFile(1);//1 - audio, 2 - image
+    },
+    chooseImage(){
+        AudioLevel.chooseFile(2);//1 - audio, 2 - image
     },
     render() {
         const { data: { isUpdate } } = this.props;
@@ -136,6 +149,13 @@ const EditLimtsView = React.createClass({
                     style={ styles.button }>
                     <View>
                         <Text style={styles.buttontext}>{ this.state.audio.title || 'Sound Alert' }</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={ this.chooseImage }
+                    style={ styles.button }>
+                    <View>
+                        <Text style={styles.buttontext}>{ this.state.image.title || 'Test' }</Text>
                     </View>
                 </TouchableOpacity>
 
