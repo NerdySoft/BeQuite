@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+/*<Text style={{ color: 'white' }}>{this.props.text}</Text>*/
 export default React.createClass({
   displayName: 'TabBarButton',
   propTypes: {
@@ -19,7 +20,7 @@ export default React.createClass({
       <TouchableOpacity
         onPress={this.props.action}
         style={[styles.button, this.props.isSelected && styles.selected]}>
-        <Icon name={ this.props.icon } size={20} color='white'/><Text style={{ color: 'white' }}>{this.props.text}</Text>
+        <Icon name={ this.props.icon } size={22} color='gray'/>
       </TouchableOpacity>
     );
   }
@@ -30,9 +31,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#969696',
+    backgroundColor: 'lightgray',
   },
   selected: {
-    backgroundColor: '#6d6d6d'
+    borderBottomColor: 'steelblue',
+    borderBottomWidth: 5
   }
 });
