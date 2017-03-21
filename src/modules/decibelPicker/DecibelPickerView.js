@@ -8,10 +8,13 @@ import {
   TimePickerAndroid
 } from 'react-native';
 
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 const DecibelPickerView = React.createClass({
   propTypes: {
     setSceneParams: PropTypes.func.isRequired,
-    decibels: PropTypes.array.isRequired
+    decibels: PropTypes.array.isRequired,
+    data: PropTypes.object
   },
   getInitialState() {
     const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
@@ -22,18 +25,27 @@ const DecibelPickerView = React.createClass({
     this.props.onNavigateBack();
   },
   render() {
+    const { data: { decibels }} = this.props;
+
     return (
       <View style={ styles.container }>
-        <ListView
-            dataSource={ this.state.decibels }
-            renderRow={value =>
-            <TouchableOpacity
-                onPress={() => this.chooseDecibels(value)}
-                style={styles.limitButton}>
-              <Text>{ value } db</Text>
-            </TouchableOpacity>
-            }
-        />
+          <View style={ styles.decibelsContainer }>
+            <ListView
+                dataSource={ this.state.decibels }
+                renderRow={value =>
+                <TouchableOpacity
+                    onPress={() => this.chooseDecibels(value)}
+                    style={styles.limitButton}>
+                    <View style={styles.decibelRow}>
+                        <Text>{ value }</Text>
+                        { decibels && decibels.value === value &&
+                            <Icon style={styles.decibelCheckedIcon} name="check" size={25}/>
+                        }
+                    </View>
+                </TouchableOpacity>
+                }
+            />
+          </View>
       </View>
     );
   }
@@ -56,21 +68,30 @@ const styles = StyleSheet.create({
   },
   limitButton: {
       alignSelf: 'stretch',
-      height: 70,
-      borderBottomColor: '#bbb',
+      height: 40,
+      borderBottomColor: 'lightgray',
       borderBottomWidth: 1,
-      justifyContent: 'center',
-      marginLeft: 10,
-      marginRight: 10
+      justifyContent: 'center'
   },
   text: {
       paddingLeft: 10,
       fontSize: 20
   },
+  decibelsContainer: {
+      backgroundColor: 'white',
+      paddingLeft: 15
+  },
   decibelsValue: {
       paddingLeft: 10,
       fontSize: 15,
-  }
+  },
+    decibelRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    decibelCheckedIcon: {
+        marginRight: 10
+    }
 });
 
 export default DecibelPickerView;
