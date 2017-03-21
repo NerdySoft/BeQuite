@@ -23,7 +23,7 @@ const MicrophoneCalibrationView = React.createClass({
     },
     getInitialState(){
         return{
-            correctionValue: this.props.correction,
+            correctionValue: this.props.correction || 0,
         };
     },
     render() {
@@ -31,7 +31,7 @@ const MicrophoneCalibrationView = React.createClass({
         return (
             <View style={styles.container}>
                 <Text style={styles.text} >
-                    Correction: {this.state.correctionValue && +this.state.correctionValue.toFixed(3)} db.
+                    Correction: {this.state.correctionValue !== undefined && +this.state.correctionValue.toFixed(3)} Db
                 </Text>
                 <Slider
                     value={this.state.correctionValue}
@@ -65,15 +65,13 @@ const styles = StyleSheet.create({
 
     },
     slider: {
-
         height: 30,
-        margin: 10,
     },
     text: {
-        fontSize: 24,
+        fontSize: 20,
         textAlign: 'center',
         fontWeight: '500',
-        margin: 10,
+        margin: 30,
     },
 });
 

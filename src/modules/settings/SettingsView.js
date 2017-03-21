@@ -31,7 +31,7 @@ const SettingsView = React.createClass({
     goToCalibration(){
         this.props.dispatch(pushRoute({
             key: 'MicCalibration',
-            title: `Microphone calibration`,
+            title: `Microphone Calibration`,
             showRightComponent: 'true',
             iconName: 'save',
         }));
@@ -40,7 +40,7 @@ const SettingsView = React.createClass({
         return (
             <View style={ [styles.container] }>
                 <SettingsItem onPress={ this.goToLimits } keyProp={ 'limits' } icon="volume-down" text="Limits"/>
-                <SettingsItem onPress={ this.goToCalibration } keyProp={ 'calibration' } icon="microphone" text="Microphone calibration"/>
+                <SettingsItem onPress={ this.goToCalibration } keyProp={ 'calibration' } icon="microphone" text="Microphone Calibration"/>
             </View>
         );
     }

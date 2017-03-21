@@ -11,7 +11,7 @@ const SettingsItem = (props)=>{
     return(
         <TouchableOpacity onPress={ onPress } style={ limitButton } key={ keyProp }>
             <View style={{flex: 1, flexDirection: 'row'}}>
-                <Icon style={ iconStyle } name={ icon } size={20} color='steelblue' />
+                <Icon style={ iconStyle } name={ icon } size={22} color='gray' />
                 <Text style={ textStyle }>{ text }</Text>
             </View>
         </TouchableOpacity>
@@ -20,26 +20,22 @@ const SettingsItem = (props)=>{
 
 const styles = {
     limitButton: {
-        alignSelf: 'stretch',
-        height: 70,
-        borderBottomColor: '#bbb',
+        backgroundColor: 'white',
+        height: 60,
+        paddingHorizontal: 15,
+        borderBottomColor: 'lightgray',
         borderBottomWidth: 1,
-        justifyContent: 'center',
-        marginLeft: 10,
-        marginRight: 10
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     textStyle: {
-        paddingLeft: 10,
-        paddingTop: 20,
-        fontSize: 20
+        fontSize: 18,
+        color: '#595959',
+        marginLeft: 10
     },
     iconStyle: {
-        paddingTop: 25
+        paddingTop: 2
     },
-    decibelsValue: {
-        paddingLeft: 10,
-        fontSize: 15,
-    }
 };
 
 export default SettingsItem;

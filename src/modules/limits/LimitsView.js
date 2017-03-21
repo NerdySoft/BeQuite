@@ -38,7 +38,7 @@ const LimitsView = React.createClass({
                                 title={ `${index}` }
                                 key={ `limit-${index}` }>
                                 <Text style={styles.text}>{ limit.title.value }</Text>
-                                <Text style={styles.decibels}>{ limit.decibels.value } DB</Text>
+                                <Text style={styles.decibels}>{ limit.decibels.value } Db</Text>
                             </TouchableOpacity>
                        );
                     })
@@ -53,20 +53,20 @@ const styles = StyleSheet.create({
         flex: 1
     },
     limitButton: {
-        alignSelf: 'stretch',
-        height: 70,
-        borderBottomColor: '#bbb',
+        backgroundColor: 'white',
+        height: 60,
+        paddingHorizontal: 15,
+        borderBottomColor: 'lightgray',
         borderBottomWidth: 1,
-        justifyContent: 'center',
-        marginLeft: 10,
-        marginRight: 10
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     text: {
-        paddingLeft: 10,
-        fontSize: 20
+        fontSize: 18,
+        color: '#595959'
     },
     decibelsValue: {
-        paddingLeft: 10,
         fontSize: 15,
     }
 });

@@ -12,7 +12,6 @@ import {
     DeviceEventEmitter
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-//import dismissKeyboard from 'react-native-dismiss-keyboard';
 import { generateUUID, LimitProp } from '../../services/mainService';
 import { pushRoute, setRightComponentAction } from '../navigation/NavigationState';
 import { saveLimit, removeLimit } from '../limits/LimitsState';
@@ -26,6 +25,7 @@ const EditLimtsView = React.createClass({
         this.props.dispatch(pushRoute({
             key: 'Decibel',
             title: `Decibels`,
+            data: { decibels: this.state.decibels },
             navigateBackAction: data => data && this.setState({
                 decibels: { ...this.state.decibels, value: data.decibels}
             })
@@ -75,7 +75,7 @@ const EditLimtsView = React.createClass({
         for (const prop in this.state) {
             if (this.state.hasOwnProperty(prop)
                 && this.state[prop].isRequired && !this.state[prop].value) {
-                emptyProps.push(prop.toLocaleUpperCase());
+                emptyProps.push(prop.toLocaleLowerCase());
             }
         }
 
@@ -116,116 +116,140 @@ const EditLimtsView = React.createClass({
 
         return (
             <View style={ styles.container }>
-                <TextInput
-                    placeholder="Title"
-                    style={ styles.title }
-                    value={ this.state.title.value }
-                    onChangeText={ value => this.setState({
-                        title: { ...this.state.title, value }
-                    })}
-                />
-                <TextInput
-                    style={ styles.textmessage }
-                    placeholder="Message"
-                    multiline = { true }
-                    value={ this.state.message.value }
-                    onChangeText={ value => this.setState({
-                        message: { ...this.state.message, value }
-                    })}
-                />
-                <TouchableOpacity
-                    onPress={ this.goToDecibels }
-                    style={[styles.button, this.props.isSelected && styles.selected]}>
-                    <View>
-                        <Text style={styles.buttontext}>Sound Limit</Text>
-                    </View>
-                    <View style={styles.arrowAndDb}>
-                        <Text style={styles.decibelsvalue}>{ this.state.decibels.value } DB</Text>
-                        <Icon name="angle-right" size={22} style={styles.arrowRight}/>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={ this.chooseAudio }
-                    style={ styles.button }>
-                    <View>
-                        <Text style={styles.buttontext}>{ this.state.audio.title || 'Sound Alert' }</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity
+                <View style={styles.labelContainer}>
+                    <Text>General</Text>
+                </View>
+                <View style={styles.fieldContainer}>
+                    <TextInput
+                        placeholder="Title"
+                        style={[styles.textInput, styles.fieldUnderlined]}
+                        value={ this.state.title.value }
+                        underlineColorAndroid='transparent'
+                        autoCorrect={false}
+                        keyboardType='default'
+                        onChangeText={ value => this.setState({
+                            title: { ...this.state.title, value }
+                        })}
+                    />
+                    <TextInput
+                        style={ styles.textInput }
+                        placeholder="Message"
+                        multiline = { true }
+                        underlineColorAndroid='transparent'
+                        autoCorrect={false}
+                        keyboardType='default'
+                        value={ this.state.message.value }
+                        onChangeText={ value => this.setState({
+                            message: { ...this.state.message, value }
+                        })}
+                    />
+                </View>
+                <View style={styles.labelContainer}>
+                    <Text>Options</Text>
+                </View>
+                <View style={styles.fieldContainer}>
+                    <TouchableOpacity
+                        onPress={ this.goToDecibels }
+                        style={[styles.button, styles.fieldUnderlined]}>
+                        <View>
+                            <Text style={styles.buttonText}>Sound Limit</Text>
+                        </View>
+                        <View style={styles.arrowAndDb}>
+                            <Text style={styles.decibelsValue}>{ this.state.decibels.value } Db</Text>
+                            <Icon name="angle-right" size={22} style={styles.arrowRight}/>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={ this.chooseAudio }
+                        style={[ styles.button, styles.fieldUnderlined ]}>
+                        <View>
+                            <Text style={styles.buttonText}>{ this.state.audio.title || 'Sound Alert' }</Text>
+                        </View>
+                        <View style={styles.arrowAndDb}>
+                            <Icon name="angle-right" size={22} style={styles.arrowRight}/>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity
                     onPress={ this.chooseImage }
                     style={ styles.button }>
                     <View>
-                        <Text style={styles.buttontext}>{ this.state.image.title || 'Test' }</Text>
+                        <Text style={styles.buttonText}>{ this.state.image.title || 'Image Alert' }</Text>
+                    </View>
+                    <View style={styles.arrowAndDb}>
+                        <Icon name="angle-right" size={22} style={styles.arrowRight}/>
                     </View>
                 </TouchableOpacity>
+                </View>
 
-                { isUpdate && <TouchableOpacity
-                    onPress={this.removeLimitObj}
-                    style={[styles.bigButton, styles.deleteButton]}>
-                    <Icon name="remove" size={22} style={styles.bigButtonIcon}>
-                    </Icon>
-                    <Text style={styles.bigButtonText}>DELETE</Text>
+                { isUpdate &&
+                <View style={[styles.fieldContainer, styles.margin]}>
+                    <TouchableOpacity
+                        onPress={this.removeLimitObj}
+                        style={[styles.deleteButton, styles.deleteButton]}>
+                        <Icon name="remove" size={22} color="red"/>
+                        <Text style={styles.deleteButtonText}>Delete</Text>
                     </TouchableOpacity>
+                </View>
                 }
             </View>
         );
     }
 });
-const circle = {
-    borderWidth: 0,
-    borderRadius: 40,
-    width: 80,
-    height: 80
-};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'flex-start',
         alignItems: 'center',
-        marginLeft: 10,
-        marginRight: 10
     },
-    title:{
-        alignSelf: 'stretch',
+    margin: {
+        marginTop: 40
     },
-    textmessage:{
+    labelContainer: {
+        paddingLeft: 15,
+        height: 40,
+        justifyContent: "flex-start",
+        flexDirection: "row",
+        alignItems: 'center',
+    },
+    fieldContainer: {
         alignSelf: 'stretch',
-
+        backgroundColor: 'white',
+        borderWidth: 1,
+        borderColor: 'lightgray',
+        paddingLeft: 15
+    },
+    textInput:{
+        height: 40,
+        color: '#393939',
+    },
+    fieldUnderlined: {
+        borderBottomWidth: 1,
+        borderBottomColor: 'lightgray'
     },
     arrowRight:{
+        marginRight: 8,
         marginLeft: 5,
         bottom: 2
     },
     button:{
-        paddingTop: 5,
-        paddingBottom: 5,
-        alignSelf: 'stretch',
-        borderBottomColor: '#bbb',
-        borderBottomWidth: 1,
         justifyContent: "space-between",
         flexDirection: "row",
-        flex: 0,
-        marginTop: 18,
-        marginBottom: 18
-
+        alignItems: 'center',
+        height: 40
     },
-    buttontext:{
-        fontSize: 18,
-
+    buttonText:{
+        fontSize: 14,
+        color: '#393939',
     },
     arrowAndDb:{
         flexDirection: "row",
     },
-    decibelsvalue:{
-
+    decibelsValue:{
+        marginRight: 4
     },
-    bigButton:{
-        paddingTop: 10,
-        paddingBottom: 10,
-        alignSelf: 'stretch',
-        marginTop: 18,
-        marginBottom: 18,
+    deleteButton:{
+        height: 40,
         alignItems: 'center',
         flexDirection: "row",
         justifyContent : 'center'
@@ -233,15 +257,10 @@ const styles = StyleSheet.create({
     saveButton:{
         backgroundColor: 'rgba(58,224,29,0.7)',
     },
-    deleteButton:{
-        backgroundColor: 'rgba(255,0,0,0.6)',
-    },
-    bigButtonText:{
+    deleteButtonText:{
         marginLeft: 5,
-        fontSize:14
-    },
-    bigButtonIcon:{
-
+        fontSize:14,
+        color: 'red'
     }
 });
 
