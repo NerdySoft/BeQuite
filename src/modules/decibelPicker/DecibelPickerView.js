@@ -37,7 +37,7 @@ const DecibelPickerView = React.createClass({
                     onPress={() => this.chooseDecibels(value)}
                     style={styles.limitButton}>
                     <View style={styles.decibelRow}>
-                        <Text>{ value }</Text>
+                        <Text style={styles.decibelsValue}>{ value }</Text>
                         { decibels && decibels.value === value &&
                             <Icon style={styles.decibelCheckedIcon} name="check" size={25}/>
                         }
@@ -75,15 +75,14 @@ const styles = StyleSheet.create({
   },
   text: {
       paddingLeft: 10,
-      fontSize: 20
+      fontSize: 20,
   },
   decibelsContainer: {
       backgroundColor: 'white',
       paddingLeft: 15
   },
   decibelsValue: {
-      paddingLeft: 10,
-      fontSize: 15,
+      color: '#595959'
   },
     decibelRow: {
         flexDirection: 'row',

@@ -36,7 +36,7 @@ const SettingsView = React.createClass({
             <View style={ [styles.container] }>
                 <TouchableOpacity onPress={ this.goToLimits } style={ styles.limitButton } key={ 'limits' }>
                     <View style={{flex: 1, flexDirection: 'row'}}>
-                        <Icon style={ styles.icon } name="volume-down" size={20} color='steelblue' />
+                        <Icon style={ styles.icon } name="volume-down" size={22} color='gray' />
                         <Text style={ styles.text }>Limits</Text>
                     </View>
                 </TouchableOpacity>
@@ -50,26 +50,22 @@ const styles = StyleSheet.create({
         flex: 1
     },
     limitButton: {
-        alignSelf: 'stretch',
-        height: 70,
-        borderBottomColor: '#bbb',
+        backgroundColor: 'white',
+        height: 60,
+        paddingHorizontal: 15,
+        borderBottomColor: 'lightgray',
         borderBottomWidth: 1,
-        justifyContent: 'center',
-        marginLeft: 10,
-        marginRight: 10
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     text: {
-        paddingLeft: 10,
-        paddingTop: 20,
-        fontSize: 20
+        fontSize: 18,
+        color: '#595959',
+        marginLeft: 10
     },
     icon: {
-        paddingTop: 25
+        paddingTop: 2
     },
-    decibelsValue: {
-        paddingLeft: 10,
-        fontSize: 15,
-    }
 });
 
 export default SettingsView;

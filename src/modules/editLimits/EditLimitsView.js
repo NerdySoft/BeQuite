@@ -65,7 +65,7 @@ const EditLimtsView = React.createClass({
         for (const prop in this.state) {
             if (this.state.hasOwnProperty(prop)
                 && this.state[prop].isRequired && !this.state[prop].value) {
-                emptyProps.push(prop.toLocaleUpperCase());
+                emptyProps.push(prop.toLocaleLowerCase());
             }
         }
 
