@@ -31,6 +31,7 @@ const CounterView = React.createClass({
     getInitialState() {
         return {
             status: 'Click \'Start\' to measure noise',
+            image: null,
             isAudioLevelActive: false,
             isAudioStarted: false,
             springValue: new Animated.Value(0.8),
@@ -60,9 +61,6 @@ const CounterView = React.createClass({
     stopSpinAnimation () {
         this.state.spinValue.stopAnimation();
     },
-    updateStatus(status) {
-        this.setState({status});
-    },
     componentDidMount() {
         const that = this;
 
@@ -76,9 +74,13 @@ const CounterView = React.createClass({
 
                 if (limit) {
                     const audioUri = limit.audio.value || '';
+                    const image = limit.image.value || '';
+                    const status = limit.message.value || '';
+
                     that.stop();
-                    this.updateStatus(limit.message.value);
                     AudioLevel.playSong(audioUri);
+
+                    this.setState({ status, image });
                     this.stopSpinAnimation();
                     this.startSpringAnimation();
                 }
@@ -150,7 +152,7 @@ const CounterView = React.createClass({
     render() {
         const loadingStyle = this.props.loading
             ? {backgroundColor: '#eee'} : null;
-        const {isAudioLevelActive, isAudioStarted, status} = this.state;
+        const {isAudioLevelActive, isAudioStarted, status, image} = this.state;
         const spin = this.state.spinValue.interpolate({
             inputRange: [0, 1],
             outputRange: ['0deg', '360deg']
@@ -159,10 +161,16 @@ const CounterView = React.createClass({
         return (
             <View style={styles.container}>
                 <View style={{position: 'relative'}}>
-                    <Animated.Image
-                        style={[styles.animatedImage, {transform: [{rotate: spin}, {scale: this.state.springValue}]}]}
+                    {  (isAudioLevelActive || !isAudioStarted) && <Animated.Image
+                        style={[styles.animatedImage, {transform: [{rotate: spin}]}]}
                         source={{uri: 'https://cdn2.iconfinder.com/data/icons/playstation-controller-buttons-3/64/playstation-flat-icon-circle-128.png'}}>
-                    </Animated.Image>
+                        </Animated.Image>
+                    }
+                    { !isAudioLevelActive && isAudioStarted && <Animated.Image
+                        style={[styles.animatedImage, {transform: [{scale: this.state.springValue}]}]}
+                        source={{uri: image || 'https://cdn4.iconfinder.com/data/icons/ui-actions/21/refresh-128.png'}}>
+                        </Animated.Image>
+                    }
                     <View style={ styles.textContainer }>
                         <Text style={{color: 'white'}}>
                             {this.props.amplitude}

@@ -38,7 +38,7 @@ const EditLimtsView = React.createClass({
             title: new LimitProp('', true),
             message: new LimitProp('', false),
             audio: new LimitProp('', false),
-            image: new LimitProp('', true)
+            image: new LimitProp('', false)
         };
         const { data: { limit } } = this.props;
 
