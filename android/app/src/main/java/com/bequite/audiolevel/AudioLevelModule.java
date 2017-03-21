@@ -38,7 +38,9 @@ import android.app.Activity;
 
 import android.database.Cursor;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.media.RingtoneManager;
+
 
 import android.Manifest;
 import android.content.Context;
@@ -46,58 +48,69 @@ import com.bequite.R;
 
 public class AudioLevelModule extends ReactContextBaseJavaModule {
 
-  private  final String DocumentDirectoryPath = "DocumentDirectoryPath";
-  private  final String PicturesDirectoryPath = "PicturesDirectoryPath";
-  private  final String MainBundlePath = "MainBundlePath";
-  private  final String CachesDirectoryPath = "CachesDirectoryPath";
-  private  final String LibraryDirectoryPath = "LibraryDirectoryPath";
-  private  final String MusicDirectoryPath = "MusicDirectoryPath";
-  private  final String DownloadsDirectoryPath = "DownloadsDirectoryPath";
+  private final String DocumentDirectoryPath = "DocumentDirectoryPath";
+  private final String PicturesDirectoryPath = "PicturesDirectoryPath";
+  private final String MainBundlePath = "MainBundlePath";
+  private final String CachesDirectoryPath = "CachesDirectoryPath";
+  private final String LibraryDirectoryPath = "LibraryDirectoryPath";
+  private final String MusicDirectoryPath = "MusicDirectoryPath";
+  private final String DownloadsDirectoryPath = "DownloadsDirectoryPath";
 
   private Context context;
-  private  MediaRecorder mRecorder = null;//recorder to listen loud level without saving it
-  private  MediaRecorder nRecorder = null;//recorder to save audio into file
-  private  MediaPlayer mPlayer = null;//audio player
+  private MediaRecorder mRecorder = null;//recorder to listen loud level without saving it
+  private MediaRecorder nRecorder = null;//recorder to save audio into file
+  private MediaPlayer mPlayer = null;//audio player
   private Timer timer;
   private boolean isRecording = false;//
   private boolean isListeningNoise = false;//
   private int recorderSecondsElapsed;//not using it (yet)
-  private  String nFileName = null;//record file name.
+  private String nFileName = null;//record file name.
 
   private final ActivityEventListener mActivityEventListener = new BaseActivityEventListener() {
-
-
-
-
-
-
-
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent intent) {
-      if (requestCode == 1) {
+      if (requestCode == 1 || requestCode == 2) {
         if (resultCode == Activity.RESULT_OK) {
           Uri uri = intent.getData();
           File f = new File("" + uri);
           String path = uri.getPath();
           WritableMap body = Arguments.createMap();
-
-
           String fileName = "";
-          if (uri.getScheme().equals("file")) {
-            fileName = uri.getLastPathSegment();
-          } else {
-            Cursor cursor = null;
-            try {
-              cursor = getReactApplicationContext().getContentResolver().query(uri,
-                  new String[] { MediaStore.Audio.Media.DISPLAY_NAME }, null, null, null);
+          if (requestCode == 1) {
+            if (uri.getScheme().equals("file")) {
+              fileName = uri.getLastPathSegment();
+            } else {
+              Cursor cursor = null;
+              try {
+                cursor = getReactApplicationContext().getContentResolver().query(uri,
+                    new String[] { MediaStore.Audio.Media.DISPLAY_NAME }, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                  fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
+                }
+              } finally {
 
-              if (cursor != null && cursor.moveToFirst()) {
-                fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
+                if (cursor != null) {
+                  cursor.close();
+                }
               }
-            } finally {
+            }
 
-              if (cursor != null) {
+          } else if (requestCode == 2) {
+            if (uri.getScheme().equals("content")) {
+              Cursor cursor = getReactApplicationContext().getContentResolver().query(uri, null, null, null, null);
+              try {
+                if (cursor != null && cursor.moveToFirst()) {
+                  fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+              } finally {
                 cursor.close();
+              }
+            }
+            if (fileName == "") {
+              fileName = uri.getPath();
+              int cut = fileName.lastIndexOf('/');
+              if (cut != -1) {
+                fileName = fileName.substring(cut + 1);
               }
             }
           }
@@ -107,6 +120,7 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
 
           body.putString("fileURI", uri.toString());
           body.putString("fileName", fileName);
+          body.putInt("fileType", requestCode);
           sendEvent("chosenFleURI", body);
         }
       }
@@ -237,15 +251,15 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
         //}
       }
 
-       mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-         public void onCompletion(MediaPlayer mp) {
-           //promise.resolve(path);
-           mPlayer.stop();
-           mPlayer.release();
-           mPlayer = null;
-           sendEvent("playerFinished", null);
-         }
-       });
+      mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        public void onCompletion(MediaPlayer mp) {
+          //promise.resolve(path);
+          mPlayer.stop();
+          mPlayer.release();
+          mPlayer = null;
+          sendEvent("playerFinished", null);
+        }
+      });
       mPlayer.start();
 
     } catch (Exception e) {
@@ -305,12 +319,15 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void chooseAudio() {
-    Activity activity = getCurrentActivity();
-    Intent intent_upload = new Intent();
-    intent_upload.setType("audio/*");
-    intent_upload.setAction(Intent.ACTION_GET_CONTENT);
-    activity.startActivityForResult(intent_upload, 1);
+  public void chooseFile(int fileType) {
+    //String fileType = "audio";
+    if (fileType == 1 || fileType == 2) {
+      Activity activity = getCurrentActivity();
+      Intent intent_upload = new Intent();
+      intent_upload.setType(fileType == 1 ? "audio/*" : "image/*");
+      intent_upload.setAction(Intent.ACTION_GET_CONTENT);
+      activity.startActivityForResult(intent_upload, fileType);
+    }
   }
 
   private void sendEvent(String eventName, Object params) {
