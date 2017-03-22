@@ -10,7 +10,8 @@ import {
     Easing,
     NativeModules,
     NativeAppEventEmitter,
-    DeviceEventEmitter
+    DeviceEventEmitter,
+    TouchableWithoutFeedback
 } from 'react-native';
 import * as AmplitudeState from './AmplitudeState';
 import {fromDecibels} from '../../services/mainService';
@@ -34,8 +35,10 @@ const CounterView = React.createClass({
             image: null,
             isAudioLevelActive: false,
             isAudioStarted: false,
+            showPlay: true,
             springValue: new Animated.Value(0.8),
-            spinValue: new Animated.Value(0)
+            spinValue: new Animated.Value(0),
+            animatedValue: new Animated.Value(0)
         }
     },
     startSpringAnimation () {
@@ -60,6 +63,18 @@ const CounterView = React.createClass({
     },
     stopSpinAnimation () {
         this.state.spinValue.stopAnimation();
+    },
+    startButtonAnimation(animateFrom, animateTo, executeOnce){
+        this.state.animatedValue.setValue(animateFrom);
+
+        Animated.timing(this.state.animatedValue, {
+            toValue: animateTo,
+            duration: 400,
+            easing: Easing.linear
+        }).start(o => o.finished && !executeOnce && this.startButtonAnimation(1, 0, true) );
+    },
+    stopButtonAnimation(){
+        this.state.animatedValue.stopAnimation();
     },
     componentDidMount() {
         const that = this;
@@ -90,7 +105,7 @@ const CounterView = React.createClass({
         NativeAppEventEmitter.addListener('playerFinished', () => {
             this.start();
             this.stopSpringAnimation();
-            this.startSpinAnimation();
+            //this.startSpinAnimation();
         });
         NativeAppEventEmitter.addListener('logger', (data) => console.error(data.error));
     },
@@ -100,6 +115,7 @@ const CounterView = React.createClass({
     },
     start() {
         this.startSpinAnimation();
+        this.startButtonAnimation(0, 1);
         //this.startSpringAnimation();
         // AudioLevel.startRecording();
         AudioLevel.start();
@@ -158,6 +174,11 @@ const CounterView = React.createClass({
             outputRange: ['0deg', '360deg']
         });
 
+        const buttonSize = this.state.animatedValue.interpolate({
+            inputRange: [0, 0.5, 1],
+            outputRange: [120, 130, 10]
+        })
+
         return (
             <View style={styles.container}>
                 <View style={{position: 'relative'}}>
@@ -171,29 +192,29 @@ const CounterView = React.createClass({
                         source={{uri: image || 'https://cdn4.iconfinder.com/data/icons/ui-actions/21/refresh-128.png'}}>
                         </Animated.Image>
                     }
-                    <View style={ styles.textContainer }>
+                    { isAudioLevelActive && <View style={ styles.textContainer }>
                         <Text style={{color: 'white'}}>
                             {this.props.amplitude}
                         </Text>
-                    </View>
+                    </View>}
                 </View>
                 <Text style={{ marginTop: 20 }}>
                     { status }
                 </Text>
 
                 <View style={styles.btnsContainer}>
-                    <Button onPress={this.start}
+                    { <TouchableWithoutFeedback onPress={this.start}
                             title="Start"
                             disabled={ isAudioStarted }
                             color="steelblue"
                             accessibilityLabel="Start"
-                    />
-                    <Button onPress={ () => this.stop(true) }
-                            title="Stop"
-                            disabled={ !isAudioLevelActive }
-                            color="steelblue"
-                            accessibilityLabel="Stop"
-                    />
+                    >
+                        <Animated.Image
+                            style={[styles.animatedImage, {width: buttonSize || 120, height: buttonSize || 120}]}
+                            source={ require('../../../images/play-button.png') }>
+                        </Animated.Image>
+                    </TouchableWithoutFeedback>}
+
                 </View>
             </View>
         );
@@ -222,8 +243,10 @@ const styles = StyleSheet.create({
     },
     btnsContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        width: 150,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 140,
+        height: 140,
         margin: 30
     },
     counter: {
