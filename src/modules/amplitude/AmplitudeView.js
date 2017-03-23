@@ -71,7 +71,10 @@ const CounterView = React.createClass({
             toValue: animateTo,
             duration: 400,
             easing: Easing.linear
-        }).start(o => o.finished && !executeOnce && this.startButtonAnimation(1, 0, true) );
+        }).start(o => {
+            !executeOnce ? this.setState({showPlay: !this.state.showPlay}) : '';
+            return o.finished && !executeOnce && this.startButtonAnimation(1, 0, true)
+        });
     },
     stopButtonAnimation(){
         this.state.animatedValue.stopAnimation();
@@ -82,7 +85,7 @@ const CounterView = React.createClass({
         NativeAppEventEmitter.addListener('recordingProgress', (data) => {
             const decibels = parseInt(fromDecibels(data.currentAmp, that.props.correction));
 
-            that.props.dispatch(AmplitudeState.load(decibels));
+            that.props.dispatch(AmplitudeState.load(decibels || 0));
             that.processAmplitude(data.currentAmp).then(avg => {
                 const decibels = fromDecibels(avg, that.props.correction);
                 const limit = that.findLimit(decibels);
@@ -94,8 +97,9 @@ const CounterView = React.createClass({
 
                     that.stop();
                     AudioLevel.playSong(audioUri);
-
+                    that.startButtonAnimation(0, 1, true);
                     this.setState({ status, image });
+
                     this.stopSpinAnimation();
                     this.startSpringAnimation();
                 }
@@ -106,6 +110,7 @@ const CounterView = React.createClass({
             this.start();
             this.stopSpringAnimation();
             //this.startSpinAnimation();
+            this.startButtonAnimation(1, 0, true);
         });
         NativeAppEventEmitter.addListener('logger', (data) => console.error(data.error));
     },
@@ -113,9 +118,12 @@ const CounterView = React.createClass({
         NativeAppEventEmitter.removeAllListeners();
         this.stop();
     },
-    start() {
+    start(isForsed) {
         this.startSpinAnimation();
-        this.startButtonAnimation(0, 1);
+        if(isForsed){
+            this.startButtonAnimation(0, 1);
+        }
+
         //this.startSpringAnimation();
         // AudioLevel.startRecording();
         AudioLevel.start();
@@ -129,6 +137,7 @@ const CounterView = React.createClass({
 
         //  this.stopSpringAnimation();
         if (isForsed) {
+            this.startButtonAnimation(0, 1);
             this.stopSpinAnimation();
             this.setState({isAudioStarted: false});
         }
@@ -168,7 +177,7 @@ const CounterView = React.createClass({
     render() {
         const loadingStyle = this.props.loading
             ? {backgroundColor: '#eee'} : null;
-        const {isAudioLevelActive, isAudioStarted, status, image} = this.state;
+        const {isAudioLevelActive, isAudioStarted, status, image, showPlay} = this.state;
         const spin = this.state.spinValue.interpolate({
             inputRange: [0, 1],
             outputRange: ['0deg', '360deg']
@@ -176,8 +185,9 @@ const CounterView = React.createClass({
 
         const buttonSize = this.state.animatedValue.interpolate({
             inputRange: [0, 0.5, 1],
-            outputRange: [120, 130, 10]
-        })
+            outputRange: [120, 130, 0]
+        });
+
 
         return (
             <View style={styles.container}>
@@ -198,22 +208,27 @@ const CounterView = React.createClass({
                         </Text>
                     </View>}
                 </View>
-                <Text style={{ marginTop: 20 }}>
+                <Text style={{ marginTop: 20, height: 20 }}>
                     { status }
                 </Text>
 
                 <View style={styles.btnsContainer}>
-                    { <TouchableWithoutFeedback onPress={this.start}
-                            title="Start"
-                            disabled={ isAudioStarted }
-                            color="steelblue"
-                            accessibilityLabel="Start"
+                    <TouchableWithoutFeedback onPress={()=>!isAudioStarted ? this.start(true) : isAudioLevelActive? this.stop(true) : null }
+                                              title="Start"
+                                              //disabled={ !isAudioLevelActive }
+                                              color="steelblue"
+                                              accessibilityLabel="Start"
                     >
                         <Animated.Image
                             style={[styles.animatedImage, {width: buttonSize || 120, height: buttonSize || 120}]}
-                            source={ require('../../../images/play-button.png') }>
+                            source={
+                                showPlay ?
+                                require('../../../images/play-button.png') :
+                                    !showPlay ?
+                                require('../../../images/stop-button.png') : null
+                            }>
                         </Animated.Image>
-                    </TouchableWithoutFeedback>}
+                    </TouchableWithoutFeedback>
 
                 </View>
             </View>
