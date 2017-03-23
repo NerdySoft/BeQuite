@@ -2,7 +2,6 @@ import React, {PropTypes} from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
-    Button,
     Text,
     View,
     Animated,
@@ -11,10 +10,10 @@ import {
     NativeModules,
     NativeAppEventEmitter,
     DeviceEventEmitter,
-    TouchableWithoutFeedback
 } from 'react-native';
 import * as AmplitudeState from './AmplitudeState';
 import {fromDecibels} from '../../services/mainService';
+import ScaledButton from '../../components/ScaledButton';
 
 const AudioLevel = NativeModules.AudioLevel;
 
@@ -38,7 +37,6 @@ const CounterView = React.createClass({
             showPlay: true,
             springValue: new Animated.Value(0.8),
             spinValue: new Animated.Value(0),
-            animatedValue: new Animated.Value(0)
         }
     },
     startSpringAnimation () {
@@ -63,21 +61,6 @@ const CounterView = React.createClass({
     },
     stopSpinAnimation () {
         this.state.spinValue.stopAnimation();
-    },
-    startButtonAnimation(animateFrom, animateTo, executeOnce){
-        this.state.animatedValue.setValue(animateFrom);
-
-        Animated.timing(this.state.animatedValue, {
-            toValue: animateTo,
-            duration: 400,
-            easing: Easing.linear
-        }).start(o => {
-            !executeOnce ? this.setState({showPlay: !this.state.showPlay}) : '';
-            return o.finished && !executeOnce && this.startButtonAnimation(1, 0, true)
-        });
-    },
-    stopButtonAnimation(){
-        this.state.animatedValue.stopAnimation();
     },
     componentDidMount() {
         const that = this;
@@ -118,11 +101,8 @@ const CounterView = React.createClass({
         NativeAppEventEmitter.removeAllListeners();
         this.stop();
     },
-    start(isForsed) {
+    start() {
         this.startSpinAnimation();
-        if(isForsed){
-            this.startButtonAnimation(0, 1);
-        }
 
         //this.startSpringAnimation();
         // AudioLevel.startRecording();
@@ -137,7 +117,6 @@ const CounterView = React.createClass({
 
         //  this.stopSpringAnimation();
         if (isForsed) {
-            this.startButtonAnimation(0, 1);
             this.stopSpinAnimation();
             this.setState({isAudioStarted: false});
         }
@@ -183,11 +162,6 @@ const CounterView = React.createClass({
             outputRange: ['0deg', '360deg']
         });
 
-        const buttonSize = this.state.animatedValue.interpolate({
-            inputRange: [0, 0.5, 1],
-            outputRange: [120, 130, 0]
-        });
-
 
         return (
             <View style={styles.container}>
@@ -212,25 +186,13 @@ const CounterView = React.createClass({
                     { status }
                 </Text>
 
-                <View style={styles.btnsContainer}>
-                    <TouchableWithoutFeedback onPress={()=>!isAudioStarted ? this.start(true) : isAudioLevelActive? this.stop(true) : null }
-                                              title="Start"
-                                              //disabled={ !isAudioLevelActive }
-                                              color="steelblue"
-                                              accessibilityLabel="Start"
-                    >
-                        <Animated.Image
-                            style={[styles.animatedImage, {width: buttonSize || 120, height: buttonSize || 120}]}
-                            source={
-                                showPlay ?
-                                require('../../../images/play-button.png') :
-                                    !showPlay ?
-                                require('../../../images/stop-button.png') : null
-                            }>
-                        </Animated.Image>
-                    </TouchableWithoutFeedback>
+                <ScaledButton
+                    init={(func) => { this.startButtonAnimation = func }}
+                    onPress={()=>!isAudioStarted ? this.start()  : isAudioLevelActive? this.stop(true) : null }
+                    iconState1={require('../../../images/play-button.png')}
+                    iconState2={require('../../../images/stop-button.png')}
 
-                </View>
+                />
             </View>
         );
     }
@@ -255,14 +217,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         margin: 20
-    },
-    btnsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 140,
-        height: 140,
-        margin: 30
     },
     counter: {
         color: 'white',
