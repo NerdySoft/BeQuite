@@ -69,7 +69,7 @@ const CounterView = React.createClass({
 
         Animated.timing(this.state.animatedValue, {
             toValue: animateTo,
-            duration: 400,
+            duration: 200,
             easing: Easing.linear
         }).start(o => {
             !executeOnce ? this.setState({showPlay: !this.state.showPlay}) : '';
