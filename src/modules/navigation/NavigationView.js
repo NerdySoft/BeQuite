@@ -125,20 +125,26 @@ const styles = StyleSheet.create({
         marginBottom: TAB_BAR_HEIGHT
     },
     backArrowTouchable:{
-        top: 10,
-        left: 10,
-        width: 25
+        top: 0,
+        left: 0,
+        width: 50,
+        height: 60
     },
     backArrow:{
+        top: 10,
+        left: 12,
         color: 'white'
     },
     plusButtonTouchable:{
-        top: 15,
+        top: 0,
         right: 0,
-        width: 35
+        width: 75,
+        height: 60
     },
     plusButton:{
         color: 'white',
+        top: 16,
+        left: 30,
     }
 });
 

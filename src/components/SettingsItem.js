@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    StyleSheet,
     TouchableOpacity,
     View,
     Text
@@ -18,7 +19,7 @@ const SettingsItem = (props)=>{
     )
 };
 
-const styles = {
+const styles = StyleSheet.create({
     limitButton: {
         backgroundColor: 'white',
         height: 60,
@@ -36,6 +37,6 @@ const styles = {
     iconStyle: {
         paddingTop: 2
     },
-};
+});
 
 export default SettingsItem;

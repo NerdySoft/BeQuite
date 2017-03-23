@@ -41,7 +41,6 @@ import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.media.RingtoneManager;
 
-
 import android.Manifest;
 import android.content.Context;
 import com.bequite.R;
@@ -162,29 +161,48 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  private void startRecording() {
+  private void startRecording(String fileName) {
     if (isRecording == false) {
       isRecording = true;
       //TODO: need to save file somewere else.
-      //TODO: if there is no directory file will not save and error will be thrown :(
-      nFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "LastNoiseRecord.3gp";
-      nRecorder = new MediaRecorder();
+      //TODO: if there is no directory file will not save and error will be thrown :( --FIXED?
+      File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/BeQuite");
+      boolean success = true;
 
-      nRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-      nRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-      nRecorder.setOutputFile(nFileName);
-      nRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-      try {
-        nRecorder.prepare();
-      } catch (IOException e) {
-        WritableMap body = Arguments.createMap();
-        body.putString("error", "Error in startRecording(): " + e.getMessage());
-        sendEvent("logger", body);
+      if (!folder.exists()) {
+        try {
+          success = folder.mkdir();
+        } catch (Exception e) {
+          WritableMap body = Arguments.createMap();
+          body.putString("error", "Error in startRecording(): " + e.getMessage());
+          sendEvent("logger", body);
+        }
       }
 
-      nRecorder.start();
-      sendEvent("recordingNoiseStart", null);
+      if (success) {
+        nFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/BeQuite/" + fileName + ".3gp";
+        nRecorder = new MediaRecorder();
+
+        nRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        nRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        nRecorder.setOutputFile(nFileName);
+        nRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        try {
+          nRecorder.prepare();
+        } catch (IOException e) {
+          WritableMap body = Arguments.createMap();
+          body.putString("error", "Error in startRecording(): " + e.getMessage());
+          sendEvent("logger", body);
+        }
+
+        nRecorder.start();
+        sendEvent("recordingNoiseStart", null);
+      } else {
+        WritableMap body = Arguments.createMap();
+        body.putString("error", "Error in startRecording(): success came false");
+        sendEvent("logger", body);
+      }
     } else {
 
     }
@@ -303,10 +321,15 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
   public void stopRecording() {
     isRecording = false;
     //stopTimer();
+    String uri = "";
+    String filename = "";
 
     try {
       nRecorder.stop();
       nRecorder.release();
+      uri = Uri.parse("file://" + nFileName).toString();
+      String[] splittedPath = nFileName.split("/", -1);
+      filename = splittedPath[splittedPath.length - 1];
     } catch (final RuntimeException e) {
       WritableMap body = Arguments.createMap();
       body.putString("error", "Error in stopRecording(): " + e.getMessage());
@@ -315,7 +338,10 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
     } finally {
       nRecorder = null;
     }
-    sendEvent("recordingFinished", null);
+    WritableMap body = Arguments.createMap();
+    body.putString("fileName", filename);
+    body.putString("fileURI", uri);
+    sendEvent("recordingFinished", body);
   }
 
   @ReactMethod
