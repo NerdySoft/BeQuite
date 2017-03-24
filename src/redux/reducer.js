@@ -5,15 +5,14 @@ import AmplitudeStateReducer from '../modules/amplitude/AmplitudeState';
 import DecibelPickerStateReducer from '../modules/decibelPicker/DecibelPickerState';
 import SessionStateReducer, {RESET_STATE} from '../modules/session/SessionState';
 import LimitsStateReducer from '../modules/limits/LimitsState';
+import SettingsStateReducer from '../modules/settings/SettingsState';
+
 const reducers = {
-    // Counter sample app state. This can be removed in a live application
+    settings: SettingsStateReducer,
     amplitude: AmplitudeStateReducer,
     decibels: DecibelPickerStateReducer,
     limits: LimitsStateReducer,
-    // @NOTE: By convention, the navigation state must live in a subtree called
-    //`navigationState`
     navigationState: NavigationStateReducer,
-
     session: SessionStateReducer
 };
 

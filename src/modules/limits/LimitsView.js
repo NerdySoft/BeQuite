@@ -9,6 +9,7 @@ import {
     Card
 } from 'react-native';
 import * as NavigationState from '../../modules/navigation/NavigationState';
+
 const LimitsView = React.createClass({
     getSaveLimitRoute(limit){
         this.props.dispatch(NavigationState.pushRoute({
@@ -22,6 +23,17 @@ const LimitsView = React.createClass({
     },
     goToEditLimits(){
         this.getSaveLimitRoute();
+    },
+    componentDidMount() {
+        setTimeout(() => this.props.dispatch(NavigationState.setRightComponentAction(
+            () => this.props.dispatch(NavigationState.pushRoute({
+                key: 'EditLimit',
+                title: `Edit Limit`,
+                data: { isUpdate: false },
+                showRightComponent: 'true',
+                iconName: 'save',
+            }))
+        )), 500);
     },
     render() {
         const { limits } = this.props;

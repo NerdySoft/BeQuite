@@ -49,23 +49,32 @@ const initialState = fromJS({
   tabs: {
     index: 0,
     routes: [
-      {key: 'HomeTab', title: 'HOME', tabIcon: 'home'},
-      {key: 'ProfileTab', title: 'SETTINGS', tabIcon: 'cog'}
+      {key: 'Home', title: 'Home', tabIcon: 'home'},
+      {key: 'Limits', title: 'Limits', tabIcon: 'volume-down'},
+      {key: 'Settings', title: 'Settings', tabIcon: 'cog'}
     ]
   },
-  // Scenes for the `HomeTab` tab.
-  HomeTab: {
+  Home: {
     index: 0,
     routes: [{key: 'Amplitude', title: 'Home'}]
   },
-  // Scenes for the `ProfileTab` tab.
-  ProfileTab: {
+  Limits: {
     index: 0,
-    routes: [{key: 'Settings', title: 'Settings'}]
+    routes: [{
+      key: 'Limits',
+      title: `Limits`,
+      showRightComponent: 'true',
+      iconName: 'plus'
+    }]
   },
-  DecibelScene: {
+  Settings: {
     index: 0,
-    routes: [{key: 'Decibel', title: 'Decibels'}]
+    routes: [{
+      key: 'Settings',
+      title: 'Settings',
+      showRightComponent: 'true',
+      iconName: 'save'
+    }]
   },
 });
 
