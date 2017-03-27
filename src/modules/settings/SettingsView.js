@@ -23,7 +23,10 @@ const SettingsView = React.createClass({
     componentDidMount() {
         this.pickerData = this.initializePickerData();
         setTimeout(() => this.props.dispatch(setRightComponentAction(
-            () => this.props.dispatch(saveSettings(this.state))
+            () => {
+                if (Picker.isPickerShow) Picker.hide();
+                this.props.dispatch(saveSettings(this.state));
+            }
         )), 500);
     },
     initializePickerData() {

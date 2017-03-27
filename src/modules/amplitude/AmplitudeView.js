@@ -38,7 +38,83 @@ const CounterView = React.createClass({
             showPlay: true,
             springValue: new Animated.Value(0.8),
             spinValue: new Animated.Value(0),
+            alertsCount: 0,
+            currentTime: 0
         }
+    },
+    componentDidMount() {
+        const that = this;
+
+        NativeAppEventEmitter.addListener('recordingProgress', (data) => {
+            const correction = that.props.settings.correction;
+            const decibels = parseInt(fromDecibels(data.currentAmp, correction));
+
+            that.props.dispatch(AmplitudeState.load(decibels || 0));
+            that.processAmplitude(data.currentAmp).then(avg => {
+                const decibels = fromDecibels(avg, correction);
+                const limit = that.findLimit(decibels);
+
+                this.updateCurrentTime();
+
+                if (!this.verifyCurrentTime()) {
+                    this.resetAlertsIndicators();
+                }
+
+                if (limit) {
+                    const audioUri = limit.audio.value || '';
+                    const image = limit.image.value || '';
+                    const status = limit.message.value || '';
+
+                    this.stop();
+                    this.increaseAlertsCount();
+
+                    if (this.verifyAlertsCount()) {
+                        AudioLevel.playSong(audioUri);
+
+                        this.setState({ status, image });
+                        this.stopSpinAnimation();
+                        this.startButtonAnimation(0, 1, true);
+                        this.startSpringAnimation();
+                    } else {
+                        // begin recording
+                        console.log('DANGER ZONE VISITED');
+                        this.resetAlertsIndicators();
+                    }
+                }
+            });
+        });
+
+        NativeAppEventEmitter.addListener('playerFinished', () => {
+            this.start();
+            this.stopSpringAnimation();
+            this.startButtonAnimation(1, 0, true);
+        });
+        NativeAppEventEmitter.addListener('logger', (data) => console.error(data.error));
+    },
+    componentWillUnmount() {
+        NativeAppEventEmitter.removeAllListeners();
+        this.stop();
+    },
+    resetAlertsIndicators() {
+        this.setState({ alertsCount: 0, currentTime: 0 });
+    },
+    updateCurrentTime() {
+        const currentTime = this.state.currentTime + 1;
+        this.setState({ currentTime });
+    },
+    increaseAlertsCount() {
+        const alertsCount = this.state.alertsCount + 1;
+        this.setState({ alertsCount });
+    },
+    verifyCurrentTime() {
+        const timeOfDangerCollect = this.props.settings.timeOfDangerCollect;
+
+        return this.state.currentTime <= timeOfDangerCollect;
+    },
+    verifyAlertsCount() {
+        const maxCountOfAlerts = this.props.settings.maxCountOfAlerts;
+
+        return this.state.alertsCount <= maxCountOfAlerts;
     },
     startSpringAnimation () {
         this.state.springValue.setValue(0.8);
@@ -63,45 +139,6 @@ const CounterView = React.createClass({
     stopSpinAnimation () {
         this.state.spinValue.stopAnimation();
     },
-    componentDidMount() {
-        const that = this;
-
-        NativeAppEventEmitter.addListener('recordingProgress', (data) => {
-            const correction = that.props.settings.correction;
-            const decibels = parseInt(fromDecibels(data.currentAmp, correction));
-
-            that.props.dispatch(AmplitudeState.load(decibels || 0));
-            that.processAmplitude(data.currentAmp).then(avg => {
-                const decibels = fromDecibels(avg, correction);
-                const limit = that.findLimit(decibels);
-
-                if (limit) {
-                    const audioUri = limit.audio.value || '';
-                    const image = limit.image.value || '';
-                    const status = limit.message.value || '';
-
-                    that.stop();
-                    AudioLevel.playSong(audioUri);
-                    that.startButtonAnimation(0, 1, true);
-                    this.setState({ status, image });
-
-                    this.stopSpinAnimation();
-                    this.startSpringAnimation();
-                }
-            });
-        });
-
-        NativeAppEventEmitter.addListener('playerFinished', () => {
-            this.start();
-            this.stopSpringAnimation();
-            this.startButtonAnimation(1, 0, true);
-        });
-        NativeAppEventEmitter.addListener('logger', (data) => console.error(data.error));
-    },
-    componentWillUnmount() {
-        NativeAppEventEmitter.removeAllListeners();
-        this.stop();
-    },
     start() {
         this.startSpinAnimation();
 
@@ -119,6 +156,7 @@ const CounterView = React.createClass({
         //  this.stopSpringAnimation();
         if (isForsed) {
             this.stopSpinAnimation();
+            this.resetAlertsIndicators();
             this.setState({isAudioStarted: false});
         }
 
@@ -130,9 +168,10 @@ const CounterView = React.createClass({
         return this.props.dispatch(AmplitudeState.reset());
     },
     async processAmplitude(newAmpValue) {
+        const times = parseInt(this.props.settings.timeOfInitialCollect);
         amplitudeQueue.push(newAmpValue);
 
-        if (amplitudeQueue.length === 31) {
+        if (amplitudeQueue.length === times) {
             amplitudeQueue.shift();
             return amplitudeQueue.reduce((total, current) => total + current, 0) / amplitudeQueue.length;
         }

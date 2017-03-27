@@ -230,7 +230,7 @@ public class AudioLevelModule extends ReactContextBaseJavaModule {
               body.putInt("currentAmp", mRecorder.getMaxAmplitude());
               sendEvent("recordingProgress", body);
             }
-          }, 0, 500);
+          }, 0, 1000);
         }
       } catch (Exception e) {
         WritableMap body = Arguments.createMap();
