@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Picker from 'react-native-picker';
-import { showNumberPicker } from './SettingsState';
+import { saveSettings } from './SettingsState';
 import { range } from '../../services/mainService'
 import { setRightComponentAction } from '../navigation/NavigationState';
 
@@ -23,7 +23,7 @@ const SettingsView = React.createClass({
     componentDidMount() {
         this.pickerData = this.initializePickerData();
         setTimeout(() => this.props.dispatch(setRightComponentAction(
-            () => this.props.dispatch(showNumberPicker(this.state))
+            () => this.props.dispatch(saveSettings(this.state))
         )), 500);
     },
     initializePickerData() {
@@ -67,8 +67,8 @@ const SettingsView = React.createClass({
                 <View style={styles.labelContainer}>
                     <Text>General</Text>
                 </View>
-                <TouchableOpacity 
-                    style={[styles.block, styles.borderTop, styles.borderBottom]} 
+                <TouchableOpacity
+                    style={[styles.block, styles.borderTop, styles.borderBottom]}
                     onPress={() => this.showNumberPicker('times', 'timeOfInitialCollect')}>
                     <Text style={styles.title}>Time of Collecting</Text>
                     <View style={styles.iconContainer}>
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     labelContainer: {
         paddingLeft: 15,
         height: 50,
-        justifyContent: "flex-start",
+        justifyContent: "center",
         flexDirection: "row",
         alignItems: 'center',
     },
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     icon: {
-        marginLeft: 5
+        marginLeft: 8
     }
 });
 

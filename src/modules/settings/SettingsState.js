@@ -1,4 +1,5 @@
 import { Map, fromJS } from 'immutable';
+import { switchTab } from '../navigation/NavigationState';
 
 const initialState = Map({
     correction: 0,
@@ -9,10 +10,17 @@ const initialState = Map({
 
 const SAVE_SETTINGS = 'SettingsState/SAVE_SETTINGS';
 
-export function saveSettings(value){
+export function saveSettingsObj(value){
     return {
         type: SAVE_SETTINGS,
         payload: value
+    }
+}
+
+export function saveSettings(obj){
+    return dispatch => {
+        dispatch(saveSettingsObj(obj));
+        dispatch(switchTab('Home'))
     }
 }
 

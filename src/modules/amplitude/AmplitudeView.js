@@ -26,7 +26,8 @@ const CounterView = React.createClass({
         loaded: PropTypes.bool.isRequired,
         intervId: PropTypes.number,
         dispatch: PropTypes.func.isRequired,
-        limits: PropTypes.array.isRequired
+        limits: PropTypes.array.isRequired,
+        settings: PropTypes.object.isRequired
     },
     getInitialState() {
         return {
@@ -66,11 +67,12 @@ const CounterView = React.createClass({
         const that = this;
 
         NativeAppEventEmitter.addListener('recordingProgress', (data) => {
-            const decibels = parseInt(fromDecibels(data.currentAmp, that.props.correction));
+            const correction = that.props.settings.correction;
+            const decibels = parseInt(fromDecibels(data.currentAmp, correction));
 
             that.props.dispatch(AmplitudeState.load(decibels || 0));
             that.processAmplitude(data.currentAmp).then(avg => {
-                const decibels = fromDecibels(avg, that.props.correction);
+                const decibels = fromDecibels(avg, correction);
                 const limit = that.findLimit(decibels);
 
                 if (limit) {
@@ -92,7 +94,6 @@ const CounterView = React.createClass({
         NativeAppEventEmitter.addListener('playerFinished', () => {
             this.start();
             this.stopSpringAnimation();
-            //this.startSpinAnimation();
             this.startButtonAnimation(1, 0, true);
         });
         NativeAppEventEmitter.addListener('logger', (data) => console.error(data.error));

@@ -7,7 +7,6 @@ import DecibelPickerContainer from './decibelPicker/DecibelPickerViewContainer';
 
 import LimitsViewContainer from './limits/LimitsViewContainer';
 import EditLimitContainer from './editLimits/EditLimitsViewContainer';
-import MicrophoneCalibrationContainer from './microphoneCalibration/MicrophoneCalibrationContainer';
 
 
 /**
@@ -34,9 +33,6 @@ export default function AppRouter(props) {
 
   if (key === 'Settings') {
     return <SettingsViewContainer/>;
-  }
-  if(key === 'MicCalibration'){
-    return <MicrophoneCalibrationContainer/>
   }
 
   throw new Error('Unknown navigation key: ' + key);
