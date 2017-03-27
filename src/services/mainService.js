@@ -22,3 +22,13 @@ export function LimitProp(value, isRequired) {
 export function fromDecibels(value, correction = 0) {
   return (20 * Math.log10(value) + correction);
 }
+
+export function range(start, end, increment) {
+  const foo = [];
+
+  for (let i = start; i <= end; i += increment) {
+    foo.push(i);
+  }
+
+  return foo;
+}

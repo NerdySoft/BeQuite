@@ -6,10 +6,11 @@ import {
     StyleSheet,
     TouchableOpacity
 } from 'react-native';
-import { setRightComponentAction } from '../navigation/NavigationState';
-import NumberPickerDialog from 'react-native-numberpicker-dialog';
-import { saveSettings } from './SettingsState';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Picker from 'react-native-picker';
+import { showNumberPicker } from './SettingsState';
+import { range } from '../../services/mainService'
+import { setRightComponentAction } from '../navigation/NavigationState';
 
 const SettingsView = React.createClass({
     propTypes: {
@@ -20,21 +21,38 @@ const SettingsView = React.createClass({
         return { ...this.props.settings };
     },
     componentDidMount() {
+        this.pickerData = this.initializePickerData();
         setTimeout(() => this.props.dispatch(setRightComponentAction(
-            () => this.props.dispatch(saveSettings(this.state))
+            () => this.props.dispatch(showNumberPicker(this.state))
         )), 500);
     },
-    saveSettings(){
-        NumberPickerDialog.show({
-            values: ['First item', 'Second item', 'Third item'],
-            positiveButtonLabel: 'Ok',
-            negativeButtonLabel: 'Cancel',
-            message: 'What would you like to have?',
-            title: 'Nice dialog',
-        }).then((id) => {
-            // id is the index of the chosen item, or -1 if the user cancelled.
-            console.log(id);
-        });
+    initializePickerData() {
+        return {
+            alerts: range(2, 5, 1),
+            times: range(5, 60, 5)
+        }
+    },
+    showNumberPicker(type, stateProp){
+        const data = this.pickerData[type];
+
+        if (data && stateProp) {
+            const btnColor = [96, 96, 96, 1];
+
+            Picker.init({
+                pickerData: data,
+                pickerConfirmBtnText: 'Confirm',
+                pickerConfirmBtnColor: btnColor,
+                pickerCancelBtnColor: btnColor,
+                pickerCancelBtnText: 'Cancel',
+                pickerTitleText: 'Select',
+                selectedValue: [0],
+                onPickerConfirm: data => {
+                    this.setState({ [stateProp]: data });
+                }
+            });
+
+            Picker.show();
+        }
     },
     render() {
         const {
@@ -49,21 +67,27 @@ const SettingsView = React.createClass({
                 <View style={styles.labelContainer}>
                     <Text>General</Text>
                 </View>
-                <TouchableOpacity style={[styles.block, styles.borderTop, styles.borderBottom]} onPress={this.saveSettings}>
+                <TouchableOpacity 
+                    style={[styles.block, styles.borderTop, styles.borderBottom]} 
+                    onPress={() => this.showNumberPicker('times', 'timeOfInitialCollect')}>
                     <Text style={styles.title}>Time of Collecting</Text>
                     <View style={styles.iconContainer}>
                         <Text style={styles.value}>{ timeOfInitialCollect } Sec</Text>
                         <Icon  style={styles.icon} name="angle-right" size={22}/>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.block, styles.borderBottom]} onPress={this.saveSettings}>
+                <TouchableOpacity
+                    style={[styles.block, styles.borderBottom]}
+                    onPress={() => this.showNumberPicker('alerts', 'maxCountOfAlerts')}>
                     <Text style={styles.title}>Count of Alerts</Text>
                     <View style={styles.iconContainer}>
                         <Text style={styles.value}>{ maxCountOfAlerts } Times</Text>
                         <Icon  style={styles.icon} name="angle-right" size={22}/>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.block, styles.borderBottom]} onPress={this.saveSettings}>
+                <TouchableOpacity
+                    style={[styles.block, styles.borderBottom]}
+                    onPress={() => this.showNumberPicker('times', 'timeOfDangerCollect')}>
                     <Text style={styles.title}>Time of Warning Listening</Text>
                     <View style={styles.iconContainer}>
                         <Text style={styles.value}>{ timeOfDangerCollect } Sec</Text>
